@@ -270,6 +270,10 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 
 <div class="toast" id="toast"></div>
 
+<footer style="width:100%;text-align:center;padding:16px;font-size:11px;color:var(--gray4);margin-top:auto">
+  Made with ❤️ by <strong style="color:var(--green2)">Suneth수나</strong> · 대호주식회사 영업부
+</footer>
+
 <script>
 // ══════════════════════════════════════
 // 설정
@@ -627,10 +631,54 @@ function renderMyTeam() {
   const teamName = TEAM ? TEAM+'팀' : '';
   const list = allData.filter(r => r['영업팀']===teamName);
 
-  if (!list.length) return `<div class="empty"><div class="empty-icon">📋</div><p>${teamName} AS 내역이 없어요</p></div>`;
+  // 수량 집계
+  const 신청 = list.filter(r => r['상태']==='신청').length;
+  const 대기 = list.filter(r => r['상태']==='대기').length;
+  const 진행 = list.filter(r => r['상태']==='AS중').length;
+  const 완료 = list.filter(r => r['상태']==='완료').length;
+  const 입고예정 = 신청 + 대기;
 
-  return `<div class="sec-label">${teamName} AS 현황 · ${list.length}건</div>` +
-    list.map(r => `
+  // 마지막 업데이트 (가장 최근 신청일시)
+  const dates = list
+    .map(r => r['신청일시'] ? new Date(r['신청일시']) : null)
+    .filter(d => d && !isNaN(d));
+  const lastUpdate = dates.length
+    ? new Date(Math.max(...dates))
+    : null;
+
+  return `
+  <!-- 현황 요약 카드 -->
+  <div class="card" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);color:white;margin-bottom:12px">
+    <div style="font-size:13px;font-weight:700;opacity:.85;margin-bottom:12px">📊 ${teamName} AS 현황</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:28px;font-weight:900">${입고예정}</div>
+        <div style="font-size:11px;opacity:.85;margin-top:2px">📥 입고 예정</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:28px;font-weight:900">${진행}</div>
+        <div style="font-size:11px;opacity:.85;margin-top:2px">🔧 AS 진행중</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:22px;font-weight:900">${완료}</div>
+        <div style="font-size:11px;opacity:.8;margin-top:2px">✅ 완료 대기</div>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:22px;font-weight:900">${list.length}</div>
+        <div style="font-size:11px;opacity:.8;margin-top:2px">📋 전체</div>
+      </div>
+    </div>
+    <div style="background:rgba(0,0,0,.15);border-radius:8px;padding:8px 12px;font-size:11px;opacity:.9;display:flex;align-items:center;gap:6px">
+      🕐 마지막 업데이트: ${lastUpdate ? formatDate(lastUpdate) : '없음'}
+    </div>
+  </div>
+
+  <!-- 기계 목록 -->
+  ${list.length === 0
+    ? `<div class="empty"><div class="empty-icon">📋</div><p>${teamName} AS 내역이 없어요</p></div>`
+    : list.map(r => `
     <div class="card" style="margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div>
@@ -639,9 +687,11 @@ function renderMyTeam() {
         </div>
         <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
       </div>
-      ${r['수리내역'] ? `<div style="font-size:12px;color:var(--gray2);margin-top:8px">🔧 ${r['수리내역']}</div>` : ''}
+      ${r['고장내용'] ? `<div style="font-size:12px;color:var(--gray2);margin-top:6px">🔍 ${r['고장내용']}</div>` : ''}
+      ${r['수리내역'] ? `<div style="font-size:12px;color:var(--gray2);margin-top:4px">🔧 ${r['수리내역']}</div>` : ''}
       <div style="font-size:11px;color:var(--gray3);margin-top:6px">신청: ${formatDate(r['신청일시'])}</div>
-    </div>`).join('');
+    </div>`).join('')
+  }`;
 }
 
 // ── 리스트 아이템 공통 ──
