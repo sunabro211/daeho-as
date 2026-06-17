@@ -2,7 +2,7 @@
   "name": "대호AS관리",
   "short_name": "대호AS",
   "description": "대호주식회사 영업부 AS 관리시스템",
-  "start_url": "/?role=admin",
+  "start_url": "/daeho-as/?role=admin",
   "display": "standalone",
   "background_color": "#1B5E20",
   "theme_color": "#1B5E20",

@@ -1,5 +1,5 @@
 const CACHE = 'daeho-as-v1';
-const FILES = ['/', '/index.html'];
+const FILES = ['/daeho-as/', '/daeho-as/index.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
