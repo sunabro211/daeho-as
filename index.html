@@ -422,7 +422,11 @@ function renderIn() {
 }
 
 function renderWait() {
-  const filtered = filterByRole(allData.filter(r => r['상태']==='신청'||r['상태']==='대기'));
+  const filtered = filterByRole(allData.filter(r => {
+  if (ROLE==='admin'||ROLE==='chief') return r['상태']==='신청';
+  if (ROLE==='as') return r['상태']==='대기';
+  return r['상태']==='신청'||r['상태']==='대기';
+}));
   const urgent = filtered.filter(r => r['긴급여부']==='Y');
   const normal = filtered.filter(r => r['긴급여부']!=='Y');
   let html = '';
@@ -629,8 +633,8 @@ function listItem(r, isUrgent, num) {
           <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
         </div>
         <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
-          ${isAdmin && (r['상태']==='신청'||r['상태']==='대기') ? `<button class="btn-sm g" onclick="openCheckin('${r['제조번호']}')">📥 입고 확정</button>` : ''}
-          ${isAs && r['상태']==='대기' ? `<button class="btn-sm b" onclick="openStartAS('${r['제조번호']}')">🔧 AS 시작</button>` : ''}
+          ${isAdmin && r['상태']==='신청' ? `<button class="btn-sm g" onclick="openCheckin('${r['제조번호']}')">📥 입고 확정</button>` : ''}
+${isAs && r['상태']==='대기' ? `<button class="btn-sm b" onclick="openStartAS('${r['제조번호']}')">🔧 AS 시작</button>` : ''}
           ${ROLE==='chief' ? `<button class="btn-sm r" onclick="openForce('${r['제조번호']}')">⚡ 강제변경</button>` : ''}
         </div>
       </div>
@@ -674,7 +678,8 @@ function openCheckin(serial) {
     <div class="ib-row"><span class="ib-label">수요자</span><span class="ib-val">${r?.['수요자명']||'-'}</span></div>`;
 
   // 팀장 체크 내역 있으면 표시 + 기본값으로 세팅
-  const teamParts = r?.['입고부품체크'];
+  // 신청시 저장된 부품(입고부품체크) 또는 메모에서 읽기
+const teamParts = r?.['입고부품체크'] || r?.['메모'];
   const teamSection = document.getElementById('checkin-team-section');
   if (teamParts && teamParts.trim()) {
     teamSection.style.display = 'block';
