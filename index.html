@@ -629,7 +629,7 @@ function listItem(r, isUrgent, num) {
           <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
         </div>
         <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
-          ${isAdmin && r['상태']==='신청' ? `<button class="btn-sm g" onclick="openCheckin('${r['제조번호']}')">📥 입고 확정</button>` : ''}
+          ${isAdmin && (r['상태']==='신청'||r['상태']==='대기') ? `<button class="btn-sm g" onclick="openCheckin('${r['제조번호']}')">📥 입고 확정</button>` : ''}
           ${isAs && r['상태']==='대기' ? `<button class="btn-sm b" onclick="openStartAS('${r['제조번호']}')">🔧 AS 시작</button>` : ''}
           ${ROLE==='chief' ? `<button class="btn-sm r" onclick="openForce('${r['제조번호']}')">⚡ 강제변경</button>` : ''}
         </div>
