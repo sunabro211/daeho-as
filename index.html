@@ -27,8 +27,6 @@
   --gray1:#1A1A1A;--gray2:#424242;--gray3:#757575;--gray4:#BDBDBD;--gray5:#F5F5F5;--gray6:#FAFAFA;
 }
 body{font-family:'Noto Sans KR',sans-serif;background:#ECEFF1;min-height:100vh;display:flex;flex-direction:column;align-items:center}
-
-/* ── 헤더 ── */
 header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E3C 100%);color:white;padding:0 16px;box-shadow:0 3px 12px rgba(0,0,0,.3);position:sticky;top:0;z-index:100}
 .header-top{display:flex;align-items:center;justify-content:space-between;padding:10px 0 6px}
 .logo-wrap{display:flex;align-items:center;gap:10px}
@@ -39,24 +37,15 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 .header-title span{font-size:10px;opacity:.8;display:block;margin-left:10px;margin-top:1px}
 .role-chip{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px}
 .online-dot{width:7px;height:7px;border-radius:50%;background:#69F0AE;box-shadow:0 0 6px #69F0AE}
-
-/* ── 탭 ── */
 .tabs{width:100%;background:white;display:flex;border-bottom:2px solid #E0E0E0;box-shadow:0 2px 6px rgba(0,0,0,.06)}
 .tab{flex:1;padding:10px 2px;text-align:center;font-size:10px;font-weight:600;color:var(--gray3);cursor:pointer;border-bottom:3px solid transparent;transition:.2s;position:relative;user-select:none}
 .tab.active{color:var(--green2);border-bottom-color:var(--green2);font-weight:800}
 .tab-icon{font-size:17px;display:block;margin-bottom:2px}
 .nbadge{position:absolute;top:5px;right:calc(50% - 20px);background:var(--red2);color:white;font-size:9px;font-weight:800;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px}
 .nbadge.blue{background:var(--blue2)}
-
-/* ── 컨텐츠 ── */
 .content{width:100%;max-width:480px;padding:14px;flex:1}
-.screen{display:none}.screen.active{display:block}
-
-/* ── 카드 ── */
 .card{background:white;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:15px;margin-bottom:12px}
 .card-title{font-size:13px;font-weight:700;color:var(--gray2);margin-bottom:12px;display:flex;align-items:center;gap:6px}
-
-/* ── 입력 ── */
 .ig{margin-bottom:10px}
 .ig label{font-size:12px;font-weight:600;color:var(--gray2);display:block;margin-bottom:4px}
 .opt{font-weight:400;color:var(--gray4);font-size:11px}
@@ -64,8 +53,6 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 .ig input:focus,.ig select:focus,.ig textarea:focus{border-color:var(--green2);box-shadow:0 0 0 3px rgba(46,125,50,.1)}
 .ig textarea{resize:none;line-height:1.6}
 .row{display:flex;gap:8px}.row .ig{flex:1}
-
-/* ── 버튼 ── */
 .btn{width:100%;padding:13px;border:none;border-radius:11px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:.15s;letter-spacing:-.2px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px}
 .btn:last-child{margin-bottom:0}
 .btn:active{transform:scale(.97)}
@@ -79,8 +66,6 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 .btn-sm.o{background:var(--orange3);color:var(--orange)}
 .btn-sm.b{background:var(--blue3);color:var(--blue2)}
 .btn-sm.r{background:var(--red3);color:var(--red2)}
-
-/* ── 상태 배지 ── */
 .status{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700}
 .s-req{background:#F3E5F5;color:#6A1B9A}
 .s-wait{background:var(--orange3);color:var(--orange)}
@@ -88,17 +73,12 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 .s-done{background:var(--green4);color:var(--green2)}
 .s-out{background:#F5F5F5;color:var(--gray3)}
 .urgent-tag{background:var(--red3);color:var(--red2);font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px}
-.revisit-tag{background:var(--orange3);color:var(--orange);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
-
-/* ── QR박스 ── */
 .qr-box{background:var(--gray5);border:2px dashed var(--gray4);border-radius:14px;padding:22px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:12px}
 .qr-box:active{border-color:var(--green3);background:var(--green4)}
 .qr-icon{font-size:44px;margin-bottom:6px}
 .divider{text-align:center;color:var(--gray4);font-size:11px;margin:10px 0;position:relative}
 .divider::before,.divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:#E0E0E0}
 .divider::before{left:0}.divider::after{right:0}
-
-/* ── 리스트 아이템 ── */
 .li{background:white;border-radius:12px;box-shadow:0 1px 5px rgba(0,0,0,.07);padding:13px;margin-bottom:9px;transition:.15s}
 .li:active{transform:scale(.98)}
 .li.urgent{border-left:4px solid var(--red2)}
@@ -110,14 +90,11 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 .num-circle{width:30px;height:30px;border-radius:50%;background:var(--green4);color:var(--green2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;margin-right:10px}
 .li-inner{display:flex;align-items:center}
 .li-time{font-size:10px;color:var(--gray4);text-align:right;flex-shrink:0}
-
-/* ── 부품 체크 ── */
 .parts-box{background:var(--gray6);border-radius:10px;padding:12px;margin:8px 0;width:100%;overflow:hidden}
-.part-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #EEEEEE;width:100%;overflow:hidden}
+.part-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #EEEEEE;width:100%;overflow:hidden;cursor:pointer}
 .part-item:last-child{border-bottom:none}
 .part-cb{display:none}
 .part-name{font-size:14px;flex:1;min-width:0;padding:4px 0;cursor:pointer}
-.part-item{cursor:pointer}
 .part-item.checked{background:#E8F5E9;border-radius:8px;padding-left:8px;margin:0 -8px}
 .part-item.checked .part-name{color:var(--green2);font-weight:700}
 .part-check-icon{width:26px;height:26px;min-width:26px;border-radius:50%;border:2px solid var(--gray4);display:flex;align-items:center;justify-content:center;font-size:14px;transition:.2s;flex-shrink:0}
@@ -126,16 +103,12 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 .add-part-row input{flex:1;padding:8px 10px;border:1.5px solid #E0E0E0;border-radius:8px;font-size:13px;font-family:inherit;outline:none}
 .add-part-row input:focus{border-color:var(--green2)}
 .add-part-row button{padding:8px 14px;background:var(--green2);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}
-
-/* ── 사용부품 수량 ── */
 .used-part-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #EEEEEE}
 .used-part-item:last-child{border-bottom:none}
 .qty-btn{width:26px;height:26px;border:none;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700}
 .qty-minus{background:#E0E0E0;color:var(--gray2)}
 .qty-plus{background:var(--green4);color:var(--green2)}
 .qty-num{font-size:14px;font-weight:700;min-width:24px;text-align:center}
-
-/* ── 통계 ── */
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
 .stat-box{background:white;border-radius:12px;padding:13px;box-shadow:0 1px 5px rgba(0,0,0,.07);text-align:center}
 .stat-num{font-size:26px;font-weight:900}
@@ -149,16 +122,12 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 .bar-track{flex:1;background:#F0F0F0;border-radius:10px;height:18px;overflow:hidden}
 .bar-fill{height:100%;border-radius:10px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:white;min-width:30px;transition:.6s}
 .bar-count{font-size:11px;color:var(--gray3);width:24px;text-align:right}
-
-/* ── 이력 ── */
 .history-box{background:var(--gray6);border-radius:12px;padding:12px;margin-top:10px}
 .history-item{background:white;border-radius:10px;padding:11px;margin-bottom:8px;border-left:3px solid var(--green3)}
 .history-item:last-child{margin-bottom:0}
 .history-date{font-size:11px;color:var(--gray3);margin-bottom:3px}
 .history-content{font-size:13px;font-weight:600}
 .history-detail{font-size:11px;color:var(--gray3);margin-top:2px}
-
-/* ── 모달 ── */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:300}
 .modal-bg.open{display:flex}
 .modal{background:white;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px;animation:slideUp .25s ease;max-height:85vh;overflow-y:auto}
@@ -170,25 +139,17 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 .ib-row:last-child{margin-bottom:0}
 .ib-label{font-size:11px;color:var(--gray3)}
 .ib-val{font-size:12px;font-weight:600;color:var(--gray1)}
-
-/* ── 로딩 ── */
 .loading{text-align:center;padding:30px;color:var(--gray3)}
 .spinner{width:32px;height:32px;border:3px solid #E0E0E0;border-top-color:var(--green2);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── 토스트 ── */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--gray1);color:white;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;transition:.3s;z-index:999;white-space:nowrap;max-width:88vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.err{background:var(--red2)}
 .toast.warn{background:var(--orange2)}
-
-/* ── 섹션 라벨 ── */
 .sec-label{font-size:11px;font-weight:700;color:var(--gray3);letter-spacing:.8px;margin-bottom:8px;padding-left:2px}
 .alert-banner{background:var(--red3);border:1px solid #FFCDD2;border-radius:10px;padding:10px 13px;margin-bottom:10px;font-size:12px;color:var(--red2);font-weight:600}
 .empty{text-align:center;padding:40px 20px;color:var(--gray3)}
 .empty-icon{font-size:44px;margin-bottom:8px}
-
-/* ── 날짜 필터 ── */
 .filter-row{display:flex;gap:6px;margin-bottom:12px}
 .filter-btn{flex:1;padding:8px;border-radius:8px;border:1.5px solid #E0E0E0;background:white;font-size:12px;font-weight:600;color:var(--gray3);cursor:pointer;font-family:inherit;transition:.2s}
 .filter-btn.active{border-color:var(--green2);color:var(--green2);background:var(--green4)}
@@ -196,7 +157,6 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 </head>
 <body>
 
-<!-- 헤더 -->
 <header>
   <div class="header-top">
     <div class="logo-wrap">
@@ -216,12 +176,51 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
   </div>
 </header>
 
-<!-- 탭 -->
 <div class="tabs" id="tab-bar"></div>
 
-<!-- 컨텐츠 -->
 <div class="content" id="main-content">
   <div class="loading"><div class="spinner"></div>불러오는 중...</div>
+</div>
+
+<!-- 입고확정 모달 -->
+<div class="modal-bg" id="modal-checkin">
+  <div class="modal">
+    <h3>📥 입고 확정 <button class="modal-close" onclick="closeModal('modal-checkin')">✕</button></h3>
+    <div class="info-block" id="modal-checkin-info"></div>
+
+    <div id="checkin-team-section" style="display:none;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--blue2);margin-bottom:6px">📋 팀장 신청 시 체크 내역</div>
+      <div id="checkin-team-content" style="background:var(--blue3);border-radius:10px;padding:10px;font-size:13px;color:var(--blue2)"></div>
+    </div>
+
+    <div class="ig">
+      <label>📦 하차 부품 체크 <span class="opt">(누르면 체크/해제)</span></label>
+      <div class="parts-box" id="checkin-parts-list">
+        <div style="color:var(--gray4);font-size:12px;padding:6px">+ 버튼으로 부품을 추가하세요</div>
+      </div>
+      <div class="add-part-row">
+        <input type="text" id="checkin-new-part" placeholder="부품 추가 (예: 조인트)">
+        <button onclick="addCheckinPart()">+ 추가</button>
+      </div>
+    </div>
+
+    <button class="btn btn-green" onclick="doCheckin()">📥 입고 확정</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-checkin')">취소</button>
+  </div>
+</div>
+
+<!-- AS시작 모달 -->
+<div class="modal-bg" id="modal-start">
+  <div class="modal">
+    <h3>🔧 AS 시작 <button class="modal-close" onclick="closeModal('modal-start')">✕</button></h3>
+    <div class="info-block" id="modal-start-info"></div>
+    <div class="ig">
+      <label>담당자 이름</label>
+      <input type="text" id="start-manager" placeholder="담당 팀장 이름">
+    </div>
+    <button class="btn btn-blue" onclick="doStartAS()">🔧 AS 시작</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-start')">취소</button>
+  </div>
 </div>
 
 <!-- 출고 모달 -->
@@ -256,7 +255,7 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
   </div>
 </div>
 
-<!-- 강제변경 모달 (부서장) -->
+<!-- 강제변경 모달 -->
 <div class="modal-bg" id="modal-force">
   <div class="modal">
     <h3>⚡ 강제 상태변경 <button class="modal-close" onclick="closeModal('modal-force')">✕</button></h3>
@@ -283,14 +282,10 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 </footer>
 
 <script>
-// ══════════════════════════════════════
-// 설정
-// ══════════════════════════════════════
 const API = 'https://script.google.com/macros/s/AKfycbwErQKIOENh4pd2Cu6lamPuRsvyr9VI5i4lgT8JZm658-sza1-ikNCy0tMQxg9hMnNLtw/exec';
 
-// URL 파라미터로 역할 결정
 const params = new URLSearchParams(location.search);
-const ROLE = params.get('role') || params.get('team') ? 
+const ROLE = params.get('role') || params.get('team') ?
   (params.get('role') || 'team' + params.get('team')) : 'admin';
 const TEAM = params.get('team') || null;
 
@@ -306,15 +301,12 @@ const ROLE_INFO = {
 };
 const roleInfo = ROLE_INFO[ROLE] || ROLE_INFO['admin'];
 
-// 전역 상태
 let allData = [];
 let currentSerial = '';
 let usedParts = [];
+let checkinParts = [];
 let currentFilter = 'all';
 
-// ══════════════════════════════════════
-// 초기화
-// ══════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('role-name').textContent = roleInfo.name;
   document.getElementById('role-label').textContent = roleInfo.label;
@@ -350,62 +342,50 @@ function switchTab(t) {
   renderScreen(t);
 }
 
-// ══════════════════════════════════════
-// 데이터 로드
-// ══════════════════════════════════════
 async function loadData() {
   try {
-    let url = API + '?action=getAll';
-    const res = await fetch(url);
+    const res = await fetch(API + '?action=getAll');
     const json = await res.json();
     if (json.success) {
       allData = json.data;
       updateBadges();
       renderScreen(roleInfo.tabs[0]);
-    } else {
-      showToast('데이터 로드 실패: ' + json.error, 'err');
-    }
+    } else showToast('데이터 로드 실패: ' + json.error, 'err');
   } catch(e) {
     showToast('연결 오류: ' + e.message, 'err');
   }
 }
 
 function updateBadges() {
-  const wait = allData.filter(r => r['상태']==='대기').length;
+  const wait = allData.filter(r => r['상태']==='신청'||r['상태']==='대기').length;
   const prog = allData.filter(r => r['상태']==='AS중').length;
   const waitTab = document.querySelector('.tab[data-tab="wait"]');
   const progTab = document.querySelector('.tab[data-tab="progress"]');
-  if (waitTab && wait > 0) {
+  if (waitTab) {
     let b = waitTab.querySelector('.nbadge') || document.createElement('span');
-    b.className = 'nbadge'; b.textContent = wait;
-    waitTab.appendChild(b);
+    if (wait > 0) { b.className='nbadge'; b.textContent=wait; waitTab.appendChild(b); }
+    else b.remove?.();
   }
-  if (progTab && prog > 0) {
+  if (progTab) {
     let b = progTab.querySelector('.nbadge') || document.createElement('span');
-    b.className = 'nbadge blue'; b.textContent = prog;
-    progTab.appendChild(b);
+    if (prog > 0) { b.className='nbadge blue'; b.textContent=prog; progTab.appendChild(b); }
+    else b.remove?.();
   }
 }
 
-// ══════════════════════════════════════
-// 화면 렌더링
-// ══════════════════════════════════════
 function renderScreen(tab) {
   const c = document.getElementById('main-content');
-  if (tab === 'in')       c.innerHTML = renderIn();
-  else if (tab === 'wait')     c.innerHTML = renderWait();
-  else if (tab === 'progress') c.innerHTML = renderProgress();
-  else if (tab === 'done')     c.innerHTML = renderDone();
-  else if (tab === 'stats')    c.innerHTML = renderStats();
-  else if (tab === 'myteam')   c.innerHTML = renderMyTeam();
-  bindEvents(tab);
+  if (tab==='in')            c.innerHTML = renderIn();
+  else if (tab==='wait')     c.innerHTML = renderWait();
+  else if (tab==='progress') c.innerHTML = renderProgress();
+  else if (tab==='done')     c.innerHTML = renderDone();
+  else if (tab==='stats')    c.innerHTML = renderStats();
+  else if (tab==='myteam')   c.innerHTML = renderMyTeam();
 }
 
-// ─── 입고 화면 ───
 function renderIn() {
   const isTeam = ROLE.startsWith('team');
   const isChief = ROLE === 'chief';
-
   return `
   <div class="card">
     <div class="card-title">🔍 기계 이력 조회</div>
@@ -415,17 +395,9 @@ function renderIn() {
     </div>
     <div id="history-result"></div>
   </div>
-
   <div class="card">
     <div class="card-title">${isTeam ? '📋 입고 신청' : '📥 신규 입고 등록'}</div>
-    ${!isTeam ? `
-    <div class="qr-box" onclick="showToast('📷 카메라 기능은 실제 배포 후 사용 가능해요')">
-      <div class="qr-icon">▦</div>
-      <p>QR 코드 스캔</p>
-      <small>제조번호 자동 입력</small>
-    </div>
-    <div class="divider">또는 직접 입력</div>` : ''}
-
+    ${!isTeam ? `<div class="qr-box" onclick="showToast('📷 카메라 기능은 실제 배포 후 사용 가능해요')"><div class="qr-icon">▦</div><p>QR 코드 스캔</p><small>제조번호 자동 입력</small></div><div class="divider">또는 직접 입력</div>` : ''}
     <div class="ig"><label>제조번호</label><input type="text" id="in-serial" placeholder="예: 6R3-0192" style="text-transform:uppercase"></div>
     <div class="row">
       <div class="ig"><label>기종명</label><input type="text" id="in-model" value="로터 베이터" readonly style="background:#F5F5F5;color:#757575;cursor:not-allowed"></div>
@@ -436,47 +408,23 @@ function renderIn() {
         </select>
       </div>
     </div>
-    ${isTeam ? '' : `
-    <div class="ig"><label>영업팀</label>
-      <select id="in-team">
-        <option value="">선택</option>
-        <option>1팀</option><option>3팀</option><option>4팀</option><option>5팀</option><option>6팀</option>
-      </select>
-    </div>`}
+    ${isTeam ? '' : `<div class="ig"><label>영업팀</label><select id="in-team"><option value="">선택</option><option>1팀</option><option>3팀</option><option>4팀</option><option>5팀</option><option>6팀</option></select></div>`}
     <div class="ig"><label>수요자명 <span class="opt">(선택)</span></label><input type="text" id="in-customer" placeholder="홍길동"></div>
-
-    ${isChief ? `
-    <div class="ig" style="background:var(--red3);border-radius:10px;padding:10px">
-      <label style="color:var(--red2)">🚨 긴급 AS (부서장 전용)</label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:6px">
-        <input type="checkbox" id="in-urgent" style="width:20px;height:20px;accent-color:var(--red2)">
-        <span style="font-size:14px;font-weight:600;color:var(--red2)">긴급으로 신청</span>
-      </label>
-    </div>` : ''}
-
+    ${isChief ? `<div class="ig" style="background:var(--red3);border-radius:10px;padding:10px"><label style="color:var(--red2)">🚨 긴급 AS (부서장 전용)</label><label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:6px"><input type="checkbox" id="in-urgent" style="width:20px;height:20px;accent-color:var(--red2)"><span style="font-size:14px;font-weight:600;color:var(--red2)">긴급으로 신청</span></label></div>` : ''}
     <div class="ig" id="parts-section" style="display:none">
-      <label>📦 부품 체크</label>
-      <div class="parts-box" id="parts-list">
-        <div style="text-align:center;color:var(--gray4);font-size:12px;padding:10px">형식명 선택 후 표시됩니다</div>
-      </div>
-      <div class="add-part-row">
-        <input type="text" id="new-part-input" placeholder="새 부품 추가">
-        <button onclick="addNewPart()">+ 추가</button>
-      </div>
+      <label>📦 부품 체크 <span class="opt">(팀장 신청시 체크 — Suneth가 하차때 2차확인)</span></label>
+      <div class="parts-box" id="parts-list"><div style="text-align:center;color:var(--gray4);font-size:12px;padding:10px">형식명 선택 후 표시됩니다</div></div>
+      <div class="add-part-row"><input type="text" id="new-part-input" placeholder="새 부품 추가"><button onclick="addNewPart()">+ 추가</button></div>
     </div>
-
     <div class="ig"><label>📝 메모 <span class="opt">(선택)</span></label><textarea id="in-memo" rows="2" placeholder="보증기간 내 / 재발 AS / 특이사항 등"></textarea></div>
-
     <button class="btn btn-green" onclick="doRegister()">${isTeam ? '📋 입고 신청하기' : '📥 입고 등록'}</button>
   </div>`;
 }
 
-// ─── AS 대기 ───
 function renderWait() {
   const filtered = filterByRole(allData.filter(r => r['상태']==='신청'||r['상태']==='대기'));
   const urgent = filtered.filter(r => r['긴급여부']==='Y');
   const normal = filtered.filter(r => r['긴급여부']!=='Y');
-
   let html = '';
   if (urgent.length) {
     html += `<div class="alert-banner">🚨 긴급 AS ${urgent.length}건 대기 중</div>`;
@@ -485,17 +433,15 @@ function renderWait() {
   }
   if (normal.length) {
     html += `<div class="sec-label" style="margin-top:${urgent.length?'10px':'0'}">대기 · ${normal.length}건</div>`;
-    normal.forEach((r, i) => html += listItem(r, false, i+1));
+    normal.forEach((r,i) => html += listItem(r, false, i+1));
   }
   if (!filtered.length) html = `<div class="empty"><div class="empty-icon">✅</div><p>대기 중인 기계가 없어요</p></div>`;
   return html;
 }
 
-// ─── 진행중 ───
 function renderProgress() {
   const list = filterByRole(allData.filter(r => r['상태']==='AS중'));
   if (!list.length) return `<div class="empty"><div class="empty-icon">🔧</div><p>진행 중인 AS가 없어요</p></div>`;
-
   return list.map(r => `
   <div class="card">
     <div style="background:linear-gradient(135deg,var(--blue2),#1976D2);color:white;border-radius:10px;padding:14px;margin-bottom:12px">
@@ -503,28 +449,24 @@ function renderProgress() {
         <div>
           <div style="font-size:18px;font-weight:900">${r['기종명']||''} ${r['형식명']||''}</div>
           <div style="font-size:12px;opacity:.8;margin-top:3px">🔖 ${r['제조번호']} · ${r['영업팀']||''}${r['수요자명']?' · '+r['수요자명']:''}</div>
-          ${r['긴급여부']==='Y' ? '<span class="urgent-tag" style="margin-top:6px;display:inline-block">🚨 긴급</span>' : ''}
+          ${r['긴급여부']==='Y'?'<span class="urgent-tag" style="margin-top:6px;display:inline-block">🚨 긴급</span>':''}
         </div>
         <span class="status s-ing">AS중</span>
       </div>
       <div style="display:flex;gap:14px;margin-top:10px;flex-wrap:wrap">
         <div style="font-size:11px;opacity:.85"><strong style="display:block">입고</strong>${formatDate(r['입고일시'])}</div>
         <div style="font-size:11px;opacity:.85"><strong style="display:block">AS시작</strong>${formatDate(r['AS시작일시'])}</div>
-        ${r['담당팀장'] ? `<div style="font-size:11px;opacity:.85"><strong style="display:block">담당</strong>${r['담당팀장']}</div>` : ''}
+        ${r['담당팀장']?`<div style="font-size:11px;opacity:.85"><strong style="display:block">담당</strong>${r['담당팀장']}</div>`:''}
       </div>
     </div>
-    ${r['메모'] ? `<div style="background:var(--gold2);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:12px;color:var(--gold)">📝 ${r['메모']}</div>` : ''}
-    ${ROLE==='as' ? `
-    <button class="btn btn-blue" onclick="openComplete('${r['제조번호']}')">✅ AS 완료 처리</button>
-    ` : `<div style="font-size:12px;color:var(--gray3);text-align:center;padding:8px">AS팀장이 완료 처리합니다</div>`}
+    ${r['메모']?`<div style="background:var(--gold2);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:12px;color:var(--gold)">📝 ${r['메모']}</div>`:''}
+    ${ROLE==='as'?`<button class="btn btn-blue" onclick="openComplete('${r['제조번호']}')">✅ AS 완료 처리</button>`:`<div style="font-size:12px;color:var(--gray3);text-align:center;padding:8px">AS팀장이 완료 처리합니다</div>`}
   </div>`).join('');
 }
 
-// ─── 완료/출고 ───
 function renderDone() {
   const done = filterByRole(allData.filter(r => r['상태']==='완료'));
-  const out  = filterByRole(allData.filter(r => r['상태']==='출고')).slice(0, 5);
-
+  const out  = filterByRole(allData.filter(r => r['상태']==='출고')).slice(0,5);
   let html = `
   <div class="filter-row">
     <button class="filter-btn ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">전체</button>
@@ -535,7 +477,6 @@ function renderDone() {
     <input type="text" id="done-search" placeholder="🔍 제조번호 검색" style="flex:1;padding:10px 13px;border:1.5px solid #E0E0E0;border-radius:10px;font-size:13px;font-family:inherit;outline:none">
     <button onclick="filterDone()" style="padding:10px 14px;background:var(--green2);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">검색</button>
   </div>`;
-
   if (done.length) {
     html += `<div class="sec-label">출고 대기 · ${done.length}건</div>`;
     done.forEach(r => {
@@ -548,57 +489,46 @@ function renderDone() {
           </div>
           <span class="status s-done">완료</span>
         </div>
-        ${r['수리내역'] ? `<div style="font-size:12px;color:var(--gray2);margin-bottom:8px">🔧 ${r['수리내역']}</div>` : ''}
-        ${r['입고부품체크'] ? `
-        <div style="background:var(--orange3);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:12px;color:var(--orange2)">
-          📦 입고부품: ${r['입고부품체크']}
-        </div>` : ''}
+        ${r['수리내역']?`<div style="font-size:12px;color:var(--gray2);margin-bottom:8px">🔧 ${r['수리내역']}</div>`:''}
+        ${r['입고부품체크']?`<div style="background:var(--orange3);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:12px;color:var(--orange2)">📦 입고부품: ${r['입고부품체크']}</div>`:''}
         <div style="display:flex;justify-content:space-between;align-items:center">
           <span style="font-size:11px;color:var(--gray3)">완료: ${formatDate(r['완료일시'])}</span>
-          ${ROLE==='admin'||ROLE==='chief' ? `<button class="btn-sm o" onclick="openOut('${r['제조번호']}')">📤 출고 처리</button>` : ''}
-          ${ROLE==='chief' ? `<button class="btn-sm r" style="margin-left:4px" onclick="openForce('${r['제조번호']}')">⚡ 강제변경</button>` : ''}
+          <div style="display:flex;gap:6px">
+            ${ROLE==='admin'||ROLE==='chief'?`<button class="btn-sm o" onclick="openOut('${r['제조번호']}')">📤 출고 처리</button>`:''}
+            ${ROLE==='chief'?`<button class="btn-sm r" onclick="openForce('${r['제조번호']}')">⚡ 강제변경</button>`:''}
+          </div>
         </div>
       </div>`;
     });
   }
-
   if (out.length) {
     html += `<div class="sec-label" style="margin-top:14px;opacity:.6">최근 출고 완료</div>`;
     out.forEach(r => {
-      html += `
-      <div class="li" style="opacity:.55">
+      html += `<div class="li" style="opacity:.55">
         <div class="li-top">
-          <div>
-            <div class="li-model">${r['기종명']||''} ${r['형식명']||''}</div>
-            <div class="li-serial">🔖 ${r['제조번호']}${r['영업팀']?' · '+r['영업팀']:''}</div>
-          </div>
+          <div><div class="li-model">${r['기종명']||''} ${r['형식명']||''}</div><div class="li-serial">🔖 ${r['제조번호']}${r['영업팀']?' · '+r['영업팀']:''}</div></div>
           <span class="status s-out">출고</span>
         </div>
         <div style="font-size:11px;color:var(--gray3);margin-top:4px">출고: ${formatDate(r['출고일시'])}${r['소요일수']?' · 소요 '+r['소요일수']+'일':''}</div>
       </div>`;
     });
   }
-
   if (!done.length && !out.length) html += `<div class="empty"><div class="empty-icon">📭</div><p>완료된 AS가 없어요</p></div>`;
   return html;
 }
 
-// ─── 통계 ───
 function renderStats() {
   const total = allData.length;
-  const byStatus = {};
-  const byType = {};
-  const byTeam = {};
+  const byStatus={}, byType={}, byTeam={};
   allData.forEach(r => {
-    byStatus[r['상태']] = (byStatus[r['상태']]||0)+1;
-    if (r['형식명']) byType[r['형식명']] = (byType[r['형식명']]||0)+1;
-    if (r['영업팀']) byTeam[r['영업팀']] = (byTeam[r['영업팀']]||0)+1;
+    byStatus[r['상태']]=(byStatus[r['상태']]||0)+1;
+    if(r['형식명']) byType[r['형식명']]=(byType[r['형식명']]||0)+1;
+    if(r['영업팀']) byTeam[r['영업팀']]=(byTeam[r['영업팀']]||0)+1;
   });
-  const completed = allData.filter(r => r['소요일수']>0);
-  const avg = completed.length ? (completed.reduce((s,r)=>s+Number(r['소요일수']),0)/completed.length).toFixed(1) : '-';
-  const maxType = Math.max(...Object.values(byType), 1);
-  const maxTeam = Math.max(...Object.values(byTeam), 1);
-
+  const completed=allData.filter(r=>r['소요일수']>0);
+  const avg=completed.length?(completed.reduce((s,r)=>s+Number(r['소요일수']),0)/completed.length).toFixed(1):'-';
+  const maxType=Math.max(...Object.values(byType),1);
+  const maxTeam=Math.max(...Object.values(byTeam),1);
   return `
   <div class="card">
     <div class="card-title">📊 전체 현황</div>
@@ -609,53 +539,30 @@ function renderStats() {
       <div class="stat-box r"><div class="stat-num">${byStatus['대기']||0}</div><div class="stat-lbl">대기중</div></div>
     </div>
   </div>
-
   <div class="card">
     <div class="card-title">🚜 기종별 현황</div>
     ${Object.entries(byType).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
-    <div class="bar-row">
-      <span class="bar-label">${k}</span>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxType*100)}%;background:var(--green2)">${v}건</div></div>
-      <span class="bar-count">${v}</span>
-    </div>`).join('')||'<div style="color:var(--gray4);font-size:12px">데이터 없음</div>'}
+    <div class="bar-row"><span class="bar-label">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxType*100)}%;background:var(--green2)">${v}건</div></div><span class="bar-count">${v}</span></div>`).join('')||'<div style="color:var(--gray4);font-size:12px">데이터 없음</div>'}
   </div>
-
   <div class="card">
     <div class="card-title">👥 팀별 신청 건수</div>
     ${Object.entries(byTeam).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
-    <div class="bar-row">
-      <span class="bar-label">${k}</span>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxTeam*100)}%;background:var(--blue2)">${k}</div></div>
-      <span class="bar-count">${v}</span>
-    </div>`).join('')||'<div style="color:var(--gray4);font-size:12px">데이터 없음</div>'}
+    <div class="bar-row"><span class="bar-label">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxTeam*100)}%;background:var(--blue2)">${k}</div></div><span class="bar-count">${v}</span></div>`).join('')||'<div style="color:var(--gray4);font-size:12px">데이터 없음</div>'}
   </div>
-
-  ${ROLE==='chief'||ROLE==='admin' ? `
-  <button class="btn btn-green" onclick="showToast('📥 엑셀 다운로드는 구글 시트에서 파일 → 다운로드 → xlsx 로 저장하세요')">📥 엑셀 다운로드 안내</button>` : ''}`;
+  ${ROLE==='chief'||ROLE==='admin'?`<button class="btn btn-green" onclick="showToast('📥 구글 시트에서 파일 → 다운로드 → xlsx')">📥 엑셀 다운로드 안내</button>`:''}`;
 }
 
-// ─── 우리팀 현황 (영업팀장) ───
 function renderMyTeam() {
   const teamName = TEAM ? TEAM+'팀' : '';
   const list = allData.filter(r => r['영업팀']===teamName);
-
-  // 수량 집계
-  const 신청 = list.filter(r => r['상태']==='신청').length;
-  const 대기 = list.filter(r => r['상태']==='대기').length;
-  const 진행 = list.filter(r => r['상태']==='AS중').length;
-  const 완료 = list.filter(r => r['상태']==='완료').length;
-  const 입고예정 = 신청 + 대기;
-
-  // 마지막 업데이트 (가장 최근 신청일시)
-  const dates = list
-    .map(r => r['신청일시'] ? new Date(r['신청일시']) : null)
-    .filter(d => d && !isNaN(d));
-  const lastUpdate = dates.length
-    ? new Date(Math.max(...dates))
-    : null;
-
+  const 신청=list.filter(r=>r['상태']==='신청').length;
+  const 대기=list.filter(r=>r['상태']==='대기').length;
+  const 진행=list.filter(r=>r['상태']==='AS중').length;
+  const 완료=list.filter(r=>r['상태']==='완료').length;
+  const 입고예정=신청+대기;
+  const dates=list.map(r=>r['신청일시']?new Date(r['신청일시']):null).filter(d=>d&&!isNaN(d));
+  const lastUpdate=dates.length?new Date(Math.max(...dates)):null;
   return `
-  <!-- 현황 요약 카드 -->
   <div class="card" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);color:white;margin-bottom:12px">
     <div style="font-size:13px;font-weight:700;opacity:.85;margin-bottom:12px">📊 ${teamName} AS 현황</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
@@ -678,15 +585,13 @@ function renderMyTeam() {
         <div style="font-size:11px;opacity:.8;margin-top:2px">📋 전체</div>
       </div>
     </div>
-    <div style="background:rgba(0,0,0,.15);border-radius:8px;padding:8px 12px;font-size:11px;opacity:.9;display:flex;align-items:center;gap:6px">
-      🕐 마지막 업데이트: ${lastUpdate ? formatDate(lastUpdate) : '없음'}
+    <div style="background:rgba(0,0,0,.15);border-radius:8px;padding:8px 12px;font-size:11px;opacity:.9">
+      🕐 마지막 업데이트: ${lastUpdate?formatDate(lastUpdate):'없음'}
     </div>
   </div>
-
-  <!-- 기계 목록 -->
-  ${list.length === 0
-    ? `<div class="empty"><div class="empty-icon">📋</div><p>${teamName} AS 내역이 없어요</p></div>`
-    : list.map(r => `
+  ${list.length===0
+    ?`<div class="empty"><div class="empty-icon">📋</div><p>${teamName} AS 내역이 없어요</p></div>`
+    :list.map(r=>`
     <div class="card" style="margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div>
@@ -695,14 +600,12 @@ function renderMyTeam() {
         </div>
         <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
       </div>
-      ${r['고장내용'] ? `<div style="font-size:12px;color:var(--gray2);margin-top:6px">🔍 ${r['고장내용']}</div>` : ''}
-      ${r['수리내역'] ? `<div style="font-size:12px;color:var(--gray2);margin-top:4px">🔧 ${r['수리내역']}</div>` : ''}
+      ${r['고장내용']?`<div style="font-size:12px;color:var(--gray2);margin-top:6px">🔍 ${r['고장내용']}</div>`:''}
+      ${r['수리내역']?`<div style="font-size:12px;color:var(--gray2);margin-top:4px">🔧 ${r['수리내역']}</div>`:''}
       <div style="font-size:11px;color:var(--gray3);margin-top:6px">신청: ${formatDate(r['신청일시'])}</div>
-    </div>`).join('')
-  }`;
+    </div>`).join('')}`;
 }
 
-// ── 리스트 아이템 공통 ──
 function listItem(r, isUrgent, num) {
   const isAdmin = ROLE==='admin'||ROLE==='chief';
   const isAs = ROLE==='as';
@@ -710,8 +613,8 @@ function listItem(r, isUrgent, num) {
   <div class="li ${isUrgent?'urgent':''}">
     <div class="li-inner">
       ${isUrgent
-        ? `<div class="num-circle" style="background:var(--red3);color:var(--red2);font-size:16px">!</div>`
-        : `<div class="num-circle">${num}</div>`}
+        ?`<div class="num-circle" style="background:var(--red3);color:var(--red2);font-size:16px">!</div>`
+        :`<div class="num-circle">${num}</div>`}
       <div style="flex:1">
         <div class="li-top">
           <div>
@@ -721,13 +624,13 @@ function listItem(r, isUrgent, num) {
           <div class="li-time">${formatDate(r['신청일시'],true)}</div>
         </div>
         <div class="li-tags">
-          ${isUrgent ? `<span class="urgent-tag">🚨 긴급</span>` : ''}
-          ${r['영업팀'] ? `<span class="team-tag">${r['영업팀']}</span>` : ''}
+          ${isUrgent?`<span class="urgent-tag">🚨 긴급</span>`:''}
+          ${r['영업팀']?`<span class="team-tag">${r['영업팀']}</span>`:''}
           <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
         </div>
         <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
-          ${isAdmin && r['상태']==='신청' ? `<button class="btn-sm g" onclick="doCheckin('${r['제조번호']}')">📥 입고 확정</button>` : ''}
-          ${isAs && r['상태']==='대기' ? `<button class="btn-sm b" onclick="doStartAS('${r['제조번호']}')">🔧 AS 시작</button>` : ''}
+          ${isAdmin && r['상태']==='신청' ? `<button class="btn-sm g" onclick="openCheckin('${r['제조번호']}')">📥 입고 확정</button>` : ''}
+          ${isAs && r['상태']==='대기' ? `<button class="btn-sm b" onclick="openStartAS('${r['제조번호']}')">🔧 AS 시작</button>` : ''}
           ${ROLE==='chief' ? `<button class="btn-sm r" onclick="openForce('${r['제조번호']}')">⚡ 강제변경</button>` : ''}
         </div>
       </div>
@@ -735,11 +638,8 @@ function listItem(r, isUrgent, num) {
   </div>`;
 }
 
-// ══════════════════════════════════════
-// 액션 함수들
-// ══════════════════════════════════════
+// ══ 액션 함수들 ══
 
-// 입고 신청/등록
 async function doRegister() {
   const serial = document.getElementById('in-serial')?.value.trim().toUpperCase();
   const model  = document.getElementById('in-model')?.value.trim();
@@ -748,52 +648,104 @@ async function doRegister() {
   const customer = document.getElementById('in-customer')?.value.trim();
   const memo   = document.getElementById('in-memo')?.value.trim();
   const urgent = document.getElementById('in-urgent')?.checked || false;
-
-  if (!serial) { showToast('제조번호를 입력하세요', 'err'); return; }
-  if (!type)   { showToast('형식명을 선택하세요', 'err'); return; }
-
-  // 부품 체크 수집
+  if (!serial) { showToast('제조번호를 입력하세요','err'); return; }
+  if (!type)   { showToast('형식명을 선택하세요','err'); return; }
   const partChecks = [];
   document.querySelectorAll('#parts-list .part-item').forEach(item => {
     const cb = item.querySelector('.part-cb');
     const name = item.querySelector('.part-name')?.textContent;
     if (name) partChecks.push(name + (cb?.checked ? '✅' : '☐'));
   });
-
   showToast('⏳ 신청 중...');
-  const res = await postAPI({
-    action: 'register', serial, model, type, team, customer, memo,
-    urgent, role: ROLE,
-    parts: partChecks.join(' / ')
-  });
-  if (res.success) {
-    showToast('✅ ' + res.message);
-    document.getElementById('in-serial').value = '';
-    loadData();
+  const res = await postAPI({ action:'register', serial, model, type, team, customer, memo, urgent, role:ROLE, parts:partChecks.join(' / ') });
+  if (res.success) { showToast('✅ ' + res.message); document.getElementById('in-serial').value=''; loadData(); }
+  else showToast('❌ ' + res.error, 'err');
+}
+
+// 입고확정 모달 열기
+function openCheckin(serial) {
+  currentSerial = serial;
+  checkinParts = [];
+  const r = allData.find(d => d['제조번호']===serial);
+  document.getElementById('modal-checkin-info').innerHTML = `
+    <div class="ib-row"><span class="ib-label">기계</span><span class="ib-val">${r?.['기종명']||''} ${r?.['형식명']||''}</span></div>
+    <div class="ib-row"><span class="ib-label">제조번호</span><span class="ib-val">${serial}</span></div>
+    <div class="ib-row"><span class="ib-label">영업팀</span><span class="ib-val">${r?.['영업팀']||'-'}</span></div>
+    <div class="ib-row"><span class="ib-label">수요자</span><span class="ib-val">${r?.['수요자명']||'-'}</span></div>`;
+
+  // 팀장 체크 내역 있으면 표시 + 기본값으로 세팅
+  const teamParts = r?.['입고부품체크'];
+  const teamSection = document.getElementById('checkin-team-section');
+  if (teamParts && teamParts.trim()) {
+    teamSection.style.display = 'block';
+    document.getElementById('checkin-team-content').textContent = teamParts;
+    checkinParts = teamParts.split(' / ').map(p => ({
+      name: p.replace('✅','').replace('☐','').trim(),
+      checked: p.includes('✅')
+    })).filter(p => p.name);
   } else {
-    showToast('❌ ' + res.error, 'err');
+    teamSection.style.display = 'none';
+    checkinParts = [];
   }
+  renderCheckinParts();
+  document.getElementById('modal-checkin').classList.add('open');
 }
 
-// 입고 확정 (Suneth)
-async function doCheckin(serial) {
-  const parts = prompt('부품 체크 내용을 입력하세요\n(예: 조인트✅ 볼트☐ 오일캡✅)') || '';
+function renderCheckinParts() {
+  const el = document.getElementById('checkin-parts-list');
+  if (!checkinParts.length) {
+    el.innerHTML = `<div style="color:var(--gray4);font-size:12px;padding:6px">+ 버튼으로 부품을 추가하세요</div>`;
+    return;
+  }
+  el.innerHTML = checkinParts.map((p,i) => `
+    <div class="part-item ${p.checked?'checked':''}" id="cpi-${i}" onclick="toggleCheckinPart(${i})">
+      <div class="part-check-icon" id="cpic-${i}">${p.checked?'✓':''}</div>
+      <label class="part-name">${p.name}</label>
+    </div>`).join('');
+}
+
+function toggleCheckinPart(i) {
+  checkinParts[i].checked = !checkinParts[i].checked;
+  renderCheckinParts();
+}
+
+function addCheckinPart() {
+  const input = document.getElementById('checkin-new-part');
+  const name = input?.value.trim();
+  if (!name) return;
+  checkinParts.push({ name, checked: true });
+  renderCheckinParts();
+  input.value = '';
+}
+
+async function doCheckin() {
+  const parts = checkinParts.map(p => p.name + (p.checked?'✅':'☐')).join(' / ');
   showToast('⏳ 처리 중...');
-  const res = await postAPI({ action: 'checkin', serial, parts, role: ROLE });
-  if (res.success) { showToast('📥 입고 등록 완료!'); loadData(); }
+  const res = await postAPI({ action:'checkin', serial:currentSerial, parts, role:ROLE });
+  if (res.success) { showToast('📥 입고 확정 완료!'); closeModal('modal-checkin'); loadData(); }
   else showToast('❌ ' + res.error, 'err');
 }
 
-// AS 시작 (AS팀장)
-async function doStartAS(serial) {
-  const manager = prompt('담당 팀장 이름을 입력하세요') || '';
+// AS시작 모달 열기
+function openStartAS(serial) {
+  currentSerial = serial;
+  const r = allData.find(d => d['제조번호']===serial);
+  document.getElementById('modal-start-info').innerHTML = `
+    <div class="ib-row"><span class="ib-label">기계</span><span class="ib-val">${r?.['기종명']||''} ${r?.['형식명']||''}</span></div>
+    <div class="ib-row"><span class="ib-label">제조번호</span><span class="ib-val">${serial}</span></div>
+    <div class="ib-row"><span class="ib-label">영업팀</span><span class="ib-val">${r?.['영업팀']||'-'}</span></div>`;
+  document.getElementById('start-manager').value = '';
+  document.getElementById('modal-start').classList.add('open');
+}
+
+async function doStartAS() {
+  const manager = document.getElementById('start-manager').value.trim();
   showToast('⏳ 처리 중...');
-  const res = await postAPI({ action: 'startAS', serial, manager, role: ROLE });
-  if (res.success) { showToast('🔧 AS 시작!'); loadData(); }
+  const res = await postAPI({ action:'startAS', serial:currentSerial, manager, role:ROLE });
+  if (res.success) { showToast('🔧 AS 시작!'); closeModal('modal-start'); loadData(); }
   else showToast('❌ ' + res.error, 'err');
 }
 
-// AS 완료 모달 열기
 function openComplete(serial) {
   currentSerial = serial;
   usedParts = [];
@@ -808,21 +760,17 @@ function openComplete(serial) {
   document.getElementById('modal-complete').classList.add('open');
 }
 
-// 사용 부품 추가
 function addUsedPart() {
   const name = document.getElementById('complete-new-part').value.trim();
   if (!name) return;
-  usedParts.push({ name, qty: 1 });
+  usedParts.push({ name, qty:1 });
   renderUsedParts();
   document.getElementById('complete-new-part').value = '';
 }
 
 function renderUsedParts() {
   const el = document.getElementById('complete-parts-list');
-  if (!usedParts.length) {
-    el.innerHTML = `<div style="color:var(--gray4);font-size:12px;padding:6px">+ 버튼으로 사용한 부품을 추가하세요</div>`;
-    return;
-  }
+  if (!usedParts.length) { el.innerHTML=`<div style="color:var(--gray4);font-size:12px;padding:6px">+ 버튼으로 사용한 부품을 추가하세요</div>`; return; }
   el.innerHTML = usedParts.map((p,i) => `
     <div class="used-part-item">
       <span class="part-name">${p.name}</span>
@@ -834,29 +782,20 @@ function renderUsedParts() {
     </div>`).join('');
 }
 
-function changeQty(i, d) {
-  usedParts[i].qty = Math.max(1, usedParts[i].qty + d);
-  renderUsedParts();
-}
+function changeQty(i,d) { usedParts[i].qty=Math.max(1,usedParts[i].qty+d); renderUsedParts(); }
+function removeUsedPart(i) { usedParts.splice(i,1); renderUsedParts(); }
 
-function removeUsedPart(i) {
-  usedParts.splice(i, 1);
-  renderUsedParts();
-}
-
-// AS 완료 처리
 async function doComplete() {
   const fault  = document.getElementById('complete-fault').value.trim();
   const repair = document.getElementById('complete-repair').value.trim();
-  if (!fault)  { showToast('고장 내용을 입력하세요', 'err'); return; }
-  if (!repair) { showToast('수리 내역을 입력하세요', 'err'); return; }
+  if (!fault)  { showToast('고장 내용을 입력하세요','err'); return; }
+  if (!repair) { showToast('수리 내역을 입력하세요','err'); return; }
   showToast('⏳ 처리 중...');
   const res = await postAPI({ action:'completeAS', serial:currentSerial, fault, repair, usedParts, role:ROLE });
   if (res.success) { showToast('✅ AS 완료!'); closeModal('modal-complete'); loadData(); }
   else showToast('❌ ' + res.error, 'err');
 }
 
-// 출고 모달 열기
 function openOut(serial) {
   currentSerial = serial;
   const r = allData.find(d => d['제조번호']===serial);
@@ -867,24 +806,18 @@ function openOut(serial) {
     <div class="ib-row"><span class="ib-label">수요자</span><span class="ib-val">${r?.['수요자명']||'-'}</span></div>
     <div class="ib-row"><span class="ib-label">수리내역</span><span class="ib-val">${r?.['수리내역']||'-'}</span></div>`;
   document.getElementById('modal-out-parts').innerHTML = r?.['입고부품체크']
-    ? `<div style="background:var(--orange3);border-radius:10px;padding:10px;font-size:12px;color:var(--orange2)">📦 입고 시 부품: ${r['입고부품체크']}</div>`
-    : '';
+    ?`<div style="background:var(--orange3);border-radius:10px;padding:10px;font-size:12px;color:var(--orange2)">📦 입고 시 부품: ${r['입고부품체크']}</div>`:'';
   document.getElementById('modal-out-msg').innerHTML = `출고 처리 후 <strong>${r?.['영업팀']||''}</strong>에 알림됩니다.`;
   document.getElementById('modal-out').classList.add('open');
 }
 
-// 출고 확정
 async function doCheckout() {
   showToast('⏳ 처리 중...');
   const res = await postAPI({ action:'checkout', serial:currentSerial, role:ROLE });
-  if (res.success) {
-    showToast(`📤 출고 완료! (소요: ${res.days}일)`);
-    closeModal('modal-out');
-    loadData();
-  } else showToast('❌ ' + res.error, 'err');
+  if (res.success) { showToast(`📤 출고 완료! (소요: ${res.days}일)`); closeModal('modal-out'); loadData(); }
+  else showToast('❌ ' + res.error, 'err');
 }
 
-// 강제 상태변경 (부서장)
 function openForce(serial) {
   currentSerial = serial;
   const r = allData.find(d => d['제조번호']===serial);
@@ -904,51 +837,43 @@ async function doForceStatus() {
   else showToast('❌ ' + res.error, 'err');
 }
 
-// 이력 조회
 async function doSearch() {
   const serial = document.getElementById('search-serial').value.trim().toUpperCase();
-  if (!serial) { showToast('제조번호를 입력하세요', 'err'); return; }
+  if (!serial) { showToast('제조번호를 입력하세요','err'); return; }
   const el = document.getElementById('history-result');
   el.innerHTML = '<div class="loading"><div class="spinner"></div>조회 중...</div>';
   try {
     const res = await fetch(`${API}?action=getHistory&serial=${encodeURIComponent(serial)}`);
     const json = await res.json();
-    if (!json.success || !json.history.length) {
-      el.innerHTML = `<div style="text-align:center;padding:16px;color:var(--gray4);font-size:13px">이력이 없습니다</div>`;
-      return;
-    }
-    el.innerHTML = `
-      <div class="history-box">
-        <div style="display:flex;justify-content:space-between;margin-bottom:10px">
-          <span style="font-size:13px;font-weight:700">${serial}</span>
-          <span style="font-size:11px;color:var(--gray3)">총 <strong style="color:var(--blue2)">${json.total}회</strong> AS</span>
-        </div>
-        ${json.history.map(r => `
-        <div class="history-item">
-          <div class="history-date">${formatDate(r['신청일시'])}</div>
-          <div class="history-content">${r['기종명']||''} ${r['형식명']||''} · <span class="status ${statusClass(r['상태'])}">${r['상태']}</span></div>
-          ${r['고장내용'] ? `<div class="history-detail">🔍 ${r['고장내용']}</div>` : ''}
-          ${r['수리내역'] ? `<div class="history-detail">🔧 ${r['수리내역']}</div>` : ''}
-        </div>`).join('')}
-      </div>`;
-  } catch(e) {
-    el.innerHTML = `<div style="color:var(--red2);font-size:12px;padding:8px">조회 오류: ${e.message}</div>`;
-  }
+    if (!json.success || !json.history.length) { el.innerHTML=`<div style="text-align:center;padding:16px;color:var(--gray4);font-size:13px">이력이 없습니다</div>`; return; }
+    el.innerHTML = `<div class="history-box">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:13px;font-weight:700">${serial}</span>
+        <span style="font-size:11px;color:var(--gray3)">총 <strong style="color:var(--blue2)">${json.total}회</strong> AS</span>
+      </div>
+      ${json.history.map(r=>`
+      <div class="history-item">
+        <div class="history-date">${formatDate(r['신청일시'])}</div>
+        <div class="history-content">${r['기종명']||''} ${r['형식명']||''} · <span class="status ${statusClass(r['상태'])}">${r['상태']}</span></div>
+        ${r['고장내용']?`<div class="history-detail">🔍 ${r['고장내용']}</div>`:''}
+        ${r['수리내역']?`<div class="history-detail">🔧 ${r['수리내역']}</div>`:''}
+      </div>`).join('')}
+    </div>`;
+  } catch(e) { el.innerHTML=`<div style="color:var(--red2);font-size:12px;padding:8px">조회 오류: ${e.message}</div>`; }
 }
 
-// 부품 목록 로드
 async function loadParts() {
   const type = document.getElementById('in-type')?.value;
   const sec = document.getElementById('parts-section');
   const list = document.getElementById('parts-list');
-  if (!type || !sec || !list) return;
+  if (!type||!sec||!list) return;
   sec.style.display = 'block';
   list.innerHTML = '<div style="color:var(--gray4);font-size:12px;padding:6px">불러오는 중...</div>';
   try {
     const res = await fetch(`${API}?action=getParts&type=${encodeURIComponent(type)}`);
     const json = await res.json();
     if (json.parts && json.parts.length) {
-      list.innerHTML = json.parts.map((p, i) => `
+      list.innerHTML = json.parts.map((p,i) => `
         <div class="part-item" id="pi-${i}" onclick="togglePart(${i})">
           <div class="part-check-icon" id="pic-${i}"></div>
           <input type="checkbox" class="part-cb" id="part-${i}">
@@ -957,61 +882,48 @@ async function loadParts() {
     } else {
       list.innerHTML = `<div style="color:var(--gray4);font-size:12px;padding:6px">${type} 부품 목록 없음 — 아래서 추가하세요</div>`;
     }
-  } catch(e) {
-    list.innerHTML = `<div style="color:var(--red2);font-size:12px">오류: ${e.message}</div>`;
-  }
+  } catch(e) { list.innerHTML=`<div style="color:var(--red2);font-size:12px">오류: ${e.message}</div>`; }
 }
 
-// 새 부품 추가
 function togglePart(i) {
-  const item = document.getElementById('pi-'+i);
-  const cb = document.getElementById('part-'+i);
-  const icon = document.getElementById('pic-'+i);
-  const checked = !cb.checked;
-  cb.checked = checked;
-  item.classList.toggle('checked', checked);
-  icon.textContent = checked ? '✓' : '';
-}
-async function addNewPart() {
-  const type = document.getElementById('in-type')?.value;
-  const input = document.getElementById('new-part-input');
-  const name = input?.value.trim();
-  if (!type)  { showToast('형식명을 먼저 선택하세요', 'warn'); return; }
-  if (!name)  { showToast('부품명을 입력하세요', 'err'); return; }
-  const res = await postAPI({ action:'addPart', type, partName:name });
-  if (res.success) {
-    showToast('✅ 부품 추가됨');
-    if (input) input.value = '';
-    loadParts();
-  } else showToast('❌ ' + res.error, 'err');
+  const item=document.getElementById('pi-'+i);
+  const cb=document.getElementById('part-'+i);
+  const icon=document.getElementById('pic-'+i);
+  const checked=!cb.checked;
+  cb.checked=checked;
+  item.classList.toggle('checked',checked);
+  icon.textContent=checked?'✓':'';
 }
 
-// ══════════════════════════════════════
-// 유틸
-// ══════════════════════════════════════
+async function addNewPart() {
+  const type=document.getElementById('in-type')?.value;
+  const input=document.getElementById('new-part-input');
+  const name=input?.value.trim();
+  if (!type) { showToast('형식명을 먼저 선택하세요','warn'); return; }
+  if (!name) { showToast('부품명을 입력하세요','err'); return; }
+  const res=await postAPI({ action:'addPart', type, partName:name });
+  if (res.success) { showToast('✅ 부품 추가됨'); if(input) input.value=''; loadParts(); }
+  else showToast('❌ ' + res.error,'err');
+}
+
 async function postAPI(body) {
   try {
-    const res = await fetch(API, {
-      method: 'POST',
-      body: JSON.stringify(body)
-    });
+    const res = await fetch(API, { method:'POST', body:JSON.stringify(body) });
     return await res.json();
-  } catch(e) {
-    return { error: e.message };
-  }
+  } catch(e) { return { error: e.message }; }
 }
 
 function filterByRole(data) {
-  if (TEAM) return data.filter(r => r['영업팀'] === TEAM+'팀');
+  if (TEAM) return data.filter(r => r['영업팀']===TEAM+'팀');
   return data;
 }
 
 function statusClass(s) {
-  if (s==='신청') return 's-req';
-  if (s==='대기') return 's-wait';
-  if (s==='AS중') return 's-ing';
-  if (s==='완료') return 's-done';
-  if (s==='출고') return 's-out';
+  if(s==='신청') return 's-req';
+  if(s==='대기') return 's-wait';
+  if(s==='AS중') return 's-ing';
+  if(s==='완료') return 's-done';
+  if(s==='출고') return 's-out';
   return '';
 }
 
@@ -1020,35 +932,23 @@ function formatDate(v, short) {
   const d = new Date(v);
   if (isNaN(d)) return String(v).substring(0,10);
   const now = new Date();
-  const isToday = d.toDateString() === now.toDateString();
+  const isToday = d.toDateString()===now.toDateString();
   const time = d.toTimeString().substring(0,5);
-  if (short) return isToday ? `오늘\n${time}` : `${d.getMonth()+1}/${d.getDate()}\n${time}`;
-  return isToday ? `오늘 ${time}` : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${time}`;
+  if (short) return isToday?`오늘\n${time}`:`${d.getMonth()+1}/${d.getDate()}\n${time}`;
+  return isToday?`오늘 ${time}`:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${time}`;
 }
 
-function setFilter(f) {
-  currentFilter = f;
-  renderScreen('done');
-}
-
-function filterDone() {
-  const q = document.getElementById('done-search')?.value.trim();
-  showToast(q ? `🔍 "${q}" 검색 중...` : '전체 표시');
-}
-
-function bindEvents(tab) {}
-
-function closeModal(id) {
-  document.getElementById(id)?.classList.remove('open');
-}
+function setFilter(f) { currentFilter=f; renderScreen('done'); }
+function filterDone() { const q=document.getElementById('done-search')?.value.trim(); showToast(q?`🔍 "${q}" 검색 중...`:'전체 표시'); }
+function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
 
 let toastTimer;
 function showToast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast ' + (type?type+' ':'') + 'show';
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast '+(type?type+' ':'')+'show';
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.className='toast', 2600);
+  toastTimer=setTimeout(()=>t.className='toast',2600);
 }
 </script>
 </body>
