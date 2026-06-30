@@ -2,50 +2,65 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>대호AS관리</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="대호AS관리">
 <meta name="theme-color" content="#1B5E20">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon.ico">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<script>
-  if('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/daeho-as/sw.js');
-  }
-</script>
+<!-- QR 스캔 라이브러리 -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
+/* ============================================================
+   대호주식회사 영업부 AS 관리시스템
+   작성: Suneth수나 | 2026-08
+   ============================================================ */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap');
+
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --green:#1B5E20;--green2:#2E7D32;--green3:#43A047;--green4:#E8F5E9;
+  --green:#1B5E20;--green2:#2E7D32;--green3:#43A047;--green4:#E8F5E9;--green5:#F1F8F1;
   --blue:#0D47A1;--blue2:#1565C0;--blue3:#E3F2FD;
   --orange:#E65100;--orange2:#F57C00;--orange3:#FFF3E0;
   --red:#B71C1C;--red2:#C62828;--red3:#FFEBEE;
   --gold:#F57F17;--gold2:#FFF8E1;
+  --purple:#6A1B9A;--purple3:#F3E5F5;
   --gray1:#1A1A1A;--gray2:#424242;--gray3:#757575;--gray4:#BDBDBD;--gray5:#F5F5F5;--gray6:#FAFAFA;
 }
-body{font-family:'Noto Sans KR',sans-serif;background:#ECEFF1;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+body{font-family:'Noto Sans KR',sans-serif;background:#ECEFF1;min-height:100vh;display:flex;flex-direction:column;align-items:center;-webkit-font-smoothing:antialiased}
+
+/* ── 헤더 ── */
 header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E3C 100%);color:white;padding:0 16px;box-shadow:0 3px 12px rgba(0,0,0,.3);position:sticky;top:0;z-index:100}
 .header-top{display:flex;align-items:center;justify-content:space-between;padding:10px 0 6px}
 .logo-wrap{display:flex;align-items:center;gap:10px}
 .logo-badge{background:white;border-radius:10px;padding:6px 10px;display:flex;flex-direction:column;align-items:center;line-height:1.1}
 .logo-daeho{font-size:15px;font-weight:900;color:#1B5E20;letter-spacing:2px}
 .logo-co{font-size:8px;font-weight:600;color:#2E7D32;letter-spacing:1px}
-.header-title h1{font-size:15px;font-weight:700;margin-left:10px}
+.header-title h1{font-size:15px;font-weight:700;margin-left:10px;letter-spacing:-.3px}
 .header-title span{font-size:10px;opacity:.8;display:block;margin-left:10px;margin-top:1px}
-.role-chip{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px}
-.online-dot{width:7px;height:7px;border-radius:50%;background:#69F0AE;box-shadow:0 0 6px #69F0AE}
-.tabs{width:100%;background:white;display:flex;border-bottom:2px solid #E0E0E0;box-shadow:0 2px 6px rgba(0,0,0,.06)}
-.tab{flex:1;padding:10px 2px;text-align:center;font-size:10px;font-weight:600;color:var(--gray3);cursor:pointer;border-bottom:3px solid transparent;transition:.2s;position:relative;user-select:none}
+.role-chip{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.online-dot{width:7px;height:7px;border-radius:50%;background:#69F0AE;box-shadow:0 0 6px #69F0AE;flex-shrink:0}
+
+/* ── 탭 ── */
+.tabs{width:100%;background:white;display:flex;border-bottom:2px solid #E0E0E0;box-shadow:0 2px 6px rgba(0,0,0,.06);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:54px;padding:10px 2px;text-align:center;font-size:10px;font-weight:600;color:var(--gray3);cursor:pointer;border-bottom:3px solid transparent;transition:.2s;position:relative;user-select:none;white-space:nowrap}
 .tab.active{color:var(--green2);border-bottom-color:var(--green2);font-weight:800}
 .tab-icon{font-size:17px;display:block;margin-bottom:2px}
-.nbadge{position:absolute;top:5px;right:calc(50% - 20px);background:var(--red2);color:white;font-size:9px;font-weight:800;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px}
+.nbadge{position:absolute;top:5px;right:calc(50% - 22px);background:var(--red2);color:white;font-size:9px;font-weight:800;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px}
 .nbadge.blue{background:var(--blue2)}
+
+/* ── 컨텐츠 ── */
 .content{width:100%;max-width:480px;padding:14px;flex:1}
+
+/* ── 카드 ── */
 .card{background:white;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:15px;margin-bottom:12px}
 .card-title{font-size:13px;font-weight:700;color:var(--gray2);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+
+/* ── 입력 ── */
 .ig{margin-bottom:10px}
 .ig label{font-size:12px;font-weight:600;color:var(--gray2);display:block;margin-bottom:4px}
 .opt{font-weight:400;color:var(--gray4);font-size:11px}
@@ -53,6 +68,8 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 .ig input:focus,.ig select:focus,.ig textarea:focus{border-color:var(--green2);box-shadow:0 0 0 3px rgba(46,125,50,.1)}
 .ig textarea{resize:none;line-height:1.6}
 .row{display:flex;gap:8px}.row .ig{flex:1}
+
+/* ── 버튼 ── */
 .btn{width:100%;padding:13px;border:none;border-radius:11px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:.15s;letter-spacing:-.2px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px}
 .btn:last-child{margin-bottom:0}
 .btn:active{transform:scale(.97)}
@@ -61,102 +78,150 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 .btn-orange{background:var(--orange2);color:white}
 .btn-red{background:var(--red2);color:white}
 .btn-outline{background:white;color:var(--green2);border:2px solid var(--green2);padding:11px;font-size:13px}
-.btn-sm{padding:7px 13px;border-radius:8px;border:none;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer}
+.btn-sm{padding:7px 13px;border-radius:8px;border:none;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;transition:.15s}
+.btn-sm:active{transform:scale(.95)}
 .btn-sm.g{background:var(--green4);color:var(--green2)}
 .btn-sm.o{background:var(--orange3);color:var(--orange)}
 .btn-sm.b{background:var(--blue3);color:var(--blue2)}
 .btn-sm.r{background:var(--red3);color:var(--red2)}
-.status{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700}
-.s-req{background:#F3E5F5;color:#6A1B9A}
+.btn-sm.p{background:var(--purple3);color:var(--purple)}
+
+/* ── 상태 배지 ── */
+.status{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.s-req{background:var(--purple3);color:var(--purple)}
 .s-wait{background:var(--orange3);color:var(--orange)}
 .s-ing{background:var(--blue3);color:var(--blue2)}
 .s-done{background:var(--green4);color:var(--green2)}
-.s-out{background:#F5F5F5;color:var(--gray3)}
+.s-out{background:var(--gray5);color:var(--gray3)}
 .urgent-tag{background:var(--red3);color:var(--red2);font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px}
+.zone-tag{background:var(--gold2);color:var(--gold);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+
+/* ── QR 박스 ── */
 .qr-box{background:var(--gray5);border:2px dashed var(--gray4);border-radius:14px;padding:22px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:12px}
 .qr-box:active{border-color:var(--green3);background:var(--green4)}
 .qr-icon{font-size:44px;margin-bottom:6px}
+#qr-reader{border-radius:12px;overflow:hidden;margin-bottom:12px}
+#qr-reader video{border-radius:12px}
+
+/* ── 구분선 ── */
 .divider{text-align:center;color:var(--gray4);font-size:11px;margin:10px 0;position:relative}
 .divider::before,.divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:#E0E0E0}
 .divider::before{left:0}.divider::after{right:0}
+
+/* ── 리스트 아이템 ── */
 .li{background:white;border-radius:12px;box-shadow:0 1px 5px rgba(0,0,0,.07);padding:13px;margin-bottom:9px;transition:.15s}
 .li:active{transform:scale(.98)}
 .li.urgent{border-left:4px solid var(--red2)}
-.li-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:5px}
+.li-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:5px;gap:8px}
 .li-model{font-size:14px;font-weight:700;color:var(--gray1)}
 .li-serial{font-size:11px;color:var(--gray3);margin:2px 0}
 .li-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
 .team-tag{background:var(--blue3);color:var(--blue2);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
-.num-circle{width:30px;height:30px;border-radius:50%;background:var(--green4);color:var(--green2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;margin-right:10px}
-.li-inner{display:flex;align-items:center}
-.li-time{font-size:10px;color:var(--gray4);text-align:right;flex-shrink:0}
-.parts-box{background:var(--gray6);border-radius:10px;padding:12px;margin:8px 0;width:100%;overflow:hidden}
-.part-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #EEEEEE;width:100%;overflow:hidden;cursor:pointer}
+.num-circle{width:30px;height:30px;border-radius:50%;background:var(--green4);color:var(--green2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;margin-right:10px;margin-top:2px}
+.li-inner{display:flex;align-items:flex-start}
+.li-time{font-size:10px;color:var(--gray4);text-align:right;flex-shrink:0;white-space:pre-line}
+
+/* ── 부품 체크 ── */
+.parts-box{background:var(--gray6);border-radius:10px;padding:12px;margin:8px 0;width:100%}
+.part-item{display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid #EEEEEE;cursor:pointer;transition:.15s;border-radius:6px}
 .part-item:last-child{border-bottom:none}
-.part-cb{display:none}
-.part-name{font-size:14px;flex:1;min-width:0;padding:4px 0;cursor:pointer}
-.part-item.checked{background:#E8F5E9;border-radius:8px;padding-left:8px;margin:0 -8px}
+.part-item.checked{background:var(--green4);padding:8px 8px;margin:2px -4px}
 .part-item.checked .part-name{color:var(--green2);font-weight:700}
-.part-check-icon{width:26px;height:26px;min-width:26px;border-radius:50%;border:2px solid var(--gray4);display:flex;align-items:center;justify-content:center;font-size:14px;transition:.2s;flex-shrink:0}
-.part-item.checked .part-check-icon{background:var(--green2);border-color:var(--green2);color:white}
-.add-part-row{display:flex;gap:6px;margin-top:8px}
-.add-part-row input{flex:1;padding:8px 10px;border:1.5px solid #E0E0E0;border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+.part-cb{display:none}
+.part-check-icon{width:26px;height:26px;min-width:26px;border-radius:50%;border:2px solid var(--gray4);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;transition:.2s;flex-shrink:0;color:white}
+.part-item.checked .part-check-icon{background:var(--green2);border-color:var(--green2)}
+.part-name{font-size:14px;flex:1;min-width:0;line-height:1.3}
+.add-part-row{display:flex;gap:6px;margin-top:10px}
+.add-part-row input{flex:1;padding:8px 10px;border:1.5px solid #E0E0E0;border-radius:8px;font-size:13px;font-family:inherit;outline:none;transition:.2s}
 .add-part-row input:focus{border-color:var(--green2)}
-.add-part-row button{padding:8px 14px;background:var(--green2);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}
-.used-part-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #EEEEEE}
+.add-part-row button{padding:8px 14px;background:var(--green2);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+
+/* ── 고장 부위 그리드 ── */
+.zone-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}
+.zone-btn{padding:9px 4px;border:1.5px solid #E0E0E0;border-radius:8px;background:white;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;text-align:center;transition:.15s;color:var(--gray2)}
+.zone-btn:active{transform:scale(.95)}
+.zone-btn.selected{border-color:var(--gold);background:var(--gold2);color:var(--gold)}
+
+/* ── 사용부품 수량 ── */
+.used-part-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #EEEEEE}
 .used-part-item:last-child{border-bottom:none}
-.qty-btn{width:26px;height:26px;border:none;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700}
+.qty-btn{width:28px;height:28px;border:none;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;transition:.15s;flex-shrink:0}
+.qty-btn:active{transform:scale(.9)}
 .qty-minus{background:#E0E0E0;color:var(--gray2)}
 .qty-plus{background:var(--green4);color:var(--green2)}
-.qty-num{font-size:14px;font-weight:700;min-width:24px;text-align:center}
+.qty-num{font-size:15px;font-weight:700;min-width:26px;text-align:center}
+
+/* ── 통계 ── */
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
-.stat-box{background:white;border-radius:12px;padding:13px;box-shadow:0 1px 5px rgba(0,0,0,.07);text-align:center}
-.stat-num{font-size:26px;font-weight:900}
-.stat-lbl{font-size:10px;color:var(--gray3);margin-top:2px}
+.stat-box{background:white;border-radius:12px;padding:14px;box-shadow:0 1px 5px rgba(0,0,0,.07);text-align:center}
+.stat-num{font-size:28px;font-weight:900;line-height:1}
+.stat-lbl{font-size:10px;color:var(--gray3);margin-top:4px}
 .stat-box.g .stat-num{color:var(--green2)}
 .stat-box.b .stat-num{color:var(--blue2)}
 .stat-box.o .stat-num{color:var(--orange2)}
 .stat-box.r .stat-num{color:var(--red2)}
 .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.bar-label{font-size:12px;color:var(--gray2);width:65px;flex-shrink:0}
+.bar-label{font-size:12px;color:var(--gray2);width:70px;flex-shrink:0;text-align:right}
 .bar-track{flex:1;background:#F0F0F0;border-radius:10px;height:18px;overflow:hidden}
-.bar-fill{height:100%;border-radius:10px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:white;min-width:30px;transition:.6s}
-.bar-count{font-size:11px;color:var(--gray3);width:24px;text-align:right}
+.bar-fill{height:100%;border-radius:10px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:white;min-width:28px;transition:.6s}
+.bar-count{font-size:11px;color:var(--gray3);width:24px;text-align:right;flex-shrink:0}
+
+/* ── 이력 ── */
 .history-box{background:var(--gray6);border-radius:12px;padding:12px;margin-top:10px}
-.history-item{background:white;border-radius:10px;padding:11px;margin-bottom:8px;border-left:3px solid var(--green3)}
+.history-item{background:white;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid var(--green3);box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .history-item:last-child{margin-bottom:0}
 .history-date{font-size:11px;color:var(--gray3);margin-bottom:3px}
-.history-content{font-size:13px;font-weight:600}
-.history-detail{font-size:11px;color:var(--gray3);margin-top:2px}
+.history-content{font-size:13px;font-weight:600;color:var(--gray1);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.history-detail{font-size:11px;color:var(--gray3);margin-top:4px;line-height:1.6}
+
+/* ── 모달 ── */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:300}
 .modal-bg.open{display:flex}
-.modal{background:white;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px;animation:slideUp .25s ease;max-height:85vh;overflow-y:auto}
+.modal{background:white;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px;animation:slideUp .25s ease;max-height:88vh;overflow-y:auto}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .modal h3{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
-.modal-close{background:none;border:none;font-size:22px;color:var(--gray3);cursor:pointer;line-height:1}
+.modal-close{background:none;border:none;font-size:22px;color:var(--gray3);cursor:pointer;line-height:1;padding:0 4px}
 .info-block{background:var(--gray6);border-radius:10px;padding:12px;margin-bottom:12px}
-.ib-row{display:flex;justify-content:space-between;margin-bottom:5px}
+.ib-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;gap:8px}
 .ib-row:last-child{margin-bottom:0}
-.ib-label{font-size:11px;color:var(--gray3)}
-.ib-val{font-size:12px;font-weight:600;color:var(--gray1)}
-.loading{text-align:center;padding:30px;color:var(--gray3)}
-.spinner{width:32px;height:32px;border:3px solid #E0E0E0;border-top-color:var(--green2);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+.ib-label{font-size:11px;color:var(--gray3);flex-shrink:0}
+.ib-val{font-size:12px;font-weight:600;color:var(--gray1);text-align:right}
+
+/* ── 로딩 ── */
+.loading{text-align:center;padding:48px 20px;color:var(--gray3)}
+.spinner{width:32px;height:32px;border:3px solid #E0E0E0;border-top-color:var(--green2);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--gray1);color:white;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;transition:.3s;z-index:999;white-space:nowrap;max-width:88vw;text-align:center}
+
+/* ── 토스트 ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--gray1);color:white;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;transition:.3s;z-index:999;max-width:88vw;text-align:center;line-height:1.4}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.err{background:var(--red2)}
 .toast.warn{background:var(--orange2)}
+.toast.ok{background:var(--green2)}
+
+/* ── 기타 UI ── */
 .sec-label{font-size:11px;font-weight:700;color:var(--gray3);letter-spacing:.8px;margin-bottom:8px;padding-left:2px}
 .alert-banner{background:var(--red3);border:1px solid #FFCDD2;border-radius:10px;padding:10px 13px;margin-bottom:10px;font-size:12px;color:var(--red2);font-weight:600}
-.empty{text-align:center;padding:40px 20px;color:var(--gray3)}
-.empty-icon{font-size:44px;margin-bottom:8px}
+.empty{text-align:center;padding:48px 20px;color:var(--gray3)}
+.empty-icon{font-size:48px;margin-bottom:10px}
+.empty p{font-size:14px;line-height:1.7}
 .filter-row{display:flex;gap:6px;margin-bottom:12px}
 .filter-btn{flex:1;padding:8px;border-radius:8px;border:1.5px solid #E0E0E0;background:white;font-size:12px;font-weight:600;color:var(--gray3);cursor:pointer;font-family:inherit;transition:.2s}
 .filter-btn.active{border-color:var(--green2);color:var(--green2);background:var(--green4)}
+.notice-box{border-radius:10px;padding:12px 14px;font-size:12px;line-height:1.7;margin-bottom:10px}
+.nb-yellow{background:var(--gold2);color:#7B5800;border-left:3px solid var(--gold)}
+.nb-blue{background:var(--blue3);color:#0D3B8E;border-left:3px solid var(--blue2)}
+.nb-red{background:var(--red3);color:#7B1010;border-left:3px solid var(--red2)}
+.nb-green{background:var(--green4);color:var(--green);border-left:3px solid var(--green2)}
+.no-access{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:40px 20px}
+.no-access .icon{font-size:64px;margin-bottom:16px}
+.no-access h2{font-size:20px;font-weight:700;color:var(--gray1);margin-bottom:8px}
+.no-access p{font-size:13px;color:var(--gray3);line-height:1.8}
 </style>
 </head>
 <body>
 
+<!-- ── 헤더 ── -->
 <header>
   <div class="header-top">
     <div class="logo-wrap">
@@ -166,7 +231,7 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
       </div>
       <div class="header-title">
         <h1>영업부 AS 관리</h1>
-        <span id="role-label">로딩 중...</span>
+        <span id="role-label">확인 중...</span>
       </div>
     </div>
     <div class="role-chip">
@@ -176,44 +241,107 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
   </div>
 </header>
 
+<!-- ── 탭 바 ── -->
 <div class="tabs" id="tab-bar"></div>
 
+<!-- ── 메인 컨텐츠 ── -->
 <div class="content" id="main-content">
-  <div class="loading"><div class="spinner"></div>불러오는 중...</div>
+  <div class="loading"><div class="spinner"></div><p>불러오는 중...</p></div>
 </div>
+
+<!-- ===================================================
+     모달들
+     =================================================== -->
 
 <!-- 입고확정 모달 -->
 <div class="modal-bg" id="modal-checkin">
   <div class="modal">
-    <h3>📥 입고 확정 <button class="modal-close" onclick="closeModal('modal-checkin')">✕</button></h3>
+    <h3>📥 입고 확정
+      <button class="modal-close" onclick="closeModal('modal-checkin')">✕</button>
+    </h3>
     <div class="info-block" id="modal-checkin-info"></div>
-
     <div id="checkin-team-section" style="display:none;margin-bottom:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--blue2);margin-bottom:6px">📋 팀장 신청 시 체크 내역</div>
-      <div id="checkin-team-content" style="background:var(--blue3);border-radius:10px;padding:10px;font-size:13px;color:var(--blue2)"></div>
+      <div class="notice-box nb-blue">
+        <strong>📋 팀장 신청 시 부품 체크 내역</strong><br>
+        <span id="checkin-team-content" style="word-break:break-all"></span>
+      </div>
     </div>
-
     <div class="ig">
-      <label>📦 하차 부품 체크 <span class="opt">(누르면 체크/해제)</span></label>
+      <label>📦 하차 부품 체크 <span class="opt">(탭하면 체크/해제)</span></label>
       <div class="parts-box" id="checkin-parts-list">
-        <div style="color:var(--gray4);font-size:12px;padding:6px">+ 버튼으로 부품을 추가하세요</div>
+        <div style="color:var(--gray4);font-size:12px;padding:10px;text-align:center">+ 버튼으로 부품을 추가하세요</div>
       </div>
       <div class="add-part-row">
-        <input type="text" id="checkin-new-part" placeholder="부품 추가 (예: 조인트)">
+        <input type="text" id="checkin-new-part" placeholder="부품명 입력 (예: 조인트)">
         <button onclick="addCheckinPart()">+ 추가</button>
       </div>
     </div>
-
     <button class="btn btn-green" onclick="doCheckin()">📥 입고 확정</button>
     <button class="btn btn-outline" onclick="closeModal('modal-checkin')">취소</button>
+  </div>
+</div>
+
+<!-- 누락정보 입력 모달 (AS팀장 전용) -->
+<div class="modal-bg" id="modal-missing">
+  <div class="modal">
+    <h3>📝 누락 정보 입력
+      <button class="modal-close" onclick="closeModal('modal-missing')">✕</button>
+    </h3>
+    <div class="info-block" id="modal-missing-info"></div>
+    <div class="notice-box nb-yellow" style="margin-bottom:12px">
+      ⚠️ 비어있는 항목만 채워집니다. 이미 입력된 내용은 바뀌지 않아요.
+    </div>
+    <div class="row">
+      <div class="ig">
+        <label>형식명</label>
+        <select id="missing-type">
+          <option value="">선택</option>
+          <option>TR36</option><option>TR40</option><option>TR45</option><option>TR50</option>
+        </select>
+      </div>
+      <div class="ig">
+        <label>영업팀</label>
+        <select id="missing-team">
+          <option value="">선택</option>
+          <option>1팀</option><option>3팀</option><option>4팀</option><option>5팀</option><option>6팀</option>
+        </select>
+      </div>
+    </div>
+    <div class="ig">
+      <label>수요자명 <span class="opt">(선택)</span></label>
+      <input type="text" id="missing-customer" placeholder="홍길동">
+    </div>
+    <div class="ig">
+      <label>메모 <span class="opt">(선택)</span></label>
+      <textarea id="missing-memo" rows="2" placeholder="특이사항 등"></textarea>
+    </div>
+    <div class="ig">
+      <label>📦 부품 체크 <span class="opt">(선택)</span></label>
+      <div class="parts-box" id="missing-parts-list">
+        <div style="color:var(--gray4);font-size:12px;padding:10px;text-align:center">+ 버튼으로 부품 추가</div>
+      </div>
+      <div class="add-part-row">
+        <input type="text" id="missing-new-part" placeholder="부품명 입력">
+        <button onclick="addMissingPart()">+ 추가</button>
+      </div>
+    </div>
+    <button class="btn btn-green" onclick="doUpdateMissing()">📝 정보 저장</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-missing')">취소</button>
   </div>
 </div>
 
 <!-- AS시작 모달 -->
 <div class="modal-bg" id="modal-start">
   <div class="modal">
-    <h3>🔧 AS 시작 <button class="modal-close" onclick="closeModal('modal-start')">✕</button></h3>
+    <h3>🔧 AS 시작
+      <button class="modal-close" onclick="closeModal('modal-start')">✕</button>
+    </h3>
     <div class="info-block" id="modal-start-info"></div>
+    <div class="ig">
+      <label>🎯 고장 부위 선택 <span class="opt">(선택)</span></label>
+      <div class="zone-grid" id="start-zone-grid"></div>
+      <input type="hidden" id="start-zone-val">
+    </div>
     <div class="ig">
       <label>담당자 이름</label>
       <input type="text" id="start-manager" placeholder="담당 팀장 이름">
@@ -223,30 +351,33 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
   </div>
 </div>
 
-<!-- 출고 모달 -->
-<div class="modal-bg" id="modal-out">
-  <div class="modal">
-    <h3>📤 출고 확인 <button class="modal-close" onclick="closeModal('modal-out')">✕</button></h3>
-    <div class="info-block" id="modal-out-info"></div>
-    <div id="modal-out-parts" style="margin-bottom:12px"></div>
-    <p style="font-size:12px;color:var(--gray2);margin-bottom:14px" id="modal-out-msg"></p>
-    <button class="btn btn-orange" onclick="doCheckout()">📤 출고 확정</button>
-    <button class="btn btn-outline" onclick="closeModal('modal-out')">취소</button>
-  </div>
-</div>
-
 <!-- AS완료 모달 -->
 <div class="modal-bg" id="modal-complete">
   <div class="modal">
-    <h3>✅ AS 완료 <button class="modal-close" onclick="closeModal('modal-complete')">✕</button></h3>
+    <h3>✅ AS 완료
+      <button class="modal-close" onclick="closeModal('modal-complete')">✕</button>
+    </h3>
     <div class="info-block" id="modal-complete-info"></div>
-    <div class="ig"><label>🔍 고장 내용</label><textarea id="complete-fault" rows="2" placeholder="고장 내용 입력"></textarea></div>
-    <div class="ig"><label>🔧 수리 내역</label><textarea id="complete-repair" rows="2" placeholder="수리 내역 입력"></textarea></div>
     <div class="ig">
-      <label>🔩 사용 부품</label>
-      <div class="parts-box" id="complete-parts-list"></div>
-      <div class="add-part-row" style="margin-top:8px">
-        <input type="text" id="complete-new-part" placeholder="부품 추가">
+      <label>🎯 고장 부위 <span class="opt">(변경 가능)</span></label>
+      <div class="zone-grid" id="complete-zone-grid"></div>
+      <input type="hidden" id="complete-zone-val">
+    </div>
+    <div class="ig">
+      <label>🔍 고장 내용 <span style="color:var(--red2)">*</span></label>
+      <textarea id="complete-fault" rows="2" placeholder="어떻게 고장났는지 입력"></textarea>
+    </div>
+    <div class="ig">
+      <label>🔧 수리 내역 <span style="color:var(--red2)">*</span></label>
+      <textarea id="complete-repair" rows="2" placeholder="어떻게 수리했는지 입력"></textarea>
+    </div>
+    <div class="ig">
+      <label>🔩 사용 부품 <span class="opt">(결제/보고서용)</span></label>
+      <div class="parts-box" id="complete-parts-list">
+        <div style="color:var(--gray4);font-size:12px;padding:10px;text-align:center">+ 버튼으로 사용한 부품 추가</div>
+      </div>
+      <div class="add-part-row">
+        <input type="text" id="complete-new-part" placeholder="부품명 추가">
         <button onclick="addUsedPart()">+ 추가</button>
       </div>
     </div>
@@ -255,11 +386,28 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
   </div>
 </div>
 
-<!-- 강제변경 모달 -->
+<!-- 출고 모달 -->
+<div class="modal-bg" id="modal-out">
+  <div class="modal">
+    <h3>📤 출고 확인
+      <button class="modal-close" onclick="closeModal('modal-out')">✕</button>
+    </h3>
+    <div class="info-block" id="modal-out-info"></div>
+    <div id="modal-out-parts" style="margin-bottom:12px"></div>
+    <p id="modal-out-msg" style="font-size:12px;color:var(--gray2);margin-bottom:14px"></p>
+    <button class="btn btn-orange" onclick="doCheckout()">📤 출고 확정</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-out')">취소</button>
+  </div>
+</div>
+
+<!-- 강제변경 모달 (부서장/공장장) -->
 <div class="modal-bg" id="modal-force">
   <div class="modal">
-    <h3>⚡ 강제 상태변경 <button class="modal-close" onclick="closeModal('modal-force')">✕</button></h3>
+    <h3>⚡ 강제 상태변경
+      <button class="modal-close" onclick="closeModal('modal-force')">✕</button>
+    </h3>
     <div class="info-block" id="modal-force-info"></div>
+    <div class="notice-box nb-red" style="margin-bottom:12px">⚠️ 긴급 처리용입니다. 신중하게 사용하세요.</div>
     <div class="ig">
       <label>변경할 상태</label>
       <select id="force-status">
@@ -275,60 +423,283 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
   </div>
 </div>
 
+<!-- 정보수정 모달 (부서장/공장장/팀장/직원) -->
+<div class="modal-bg" id="modal-edit-info">
+  <div class="modal">
+    <h3>✏️ 정보 수정
+      <button class="modal-close" onclick="closeModal('modal-edit-info')">✕</button>
+    </h3>
+    <div class="info-block" id="modal-edit-info-block"></div>
+    <div class="ig" id="edit-team-wrap" style="display:none">
+      <label>영업팀</label>
+      <select id="edit-team"></select>
+    </div>
+    <div class="ig">
+      <label>수요자명</label>
+      <input type="text" id="edit-customer" placeholder="홍길동">
+    </div>
+    <div class="ig">
+      <label>지역</label>
+      <input type="text" id="edit-region" placeholder="예: 전남 나주시">
+    </div>
+    <div class="ig" id="edit-memo-wrap" style="display:none">
+      <label>메모</label>
+      <textarea id="edit-memo" rows="2"></textarea>
+    </div>
+    <button class="btn btn-blue" onclick="doEditInfo()">✏️ 저장</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-edit-info')">취소</button>
+  </div>
+</div>
+
+<!-- AS중 수리내역 수정 모달 (AS팀장) -->
+<div class="modal-bg" id="modal-edit-progress">
+  <div class="modal">
+    <h3>🔧 수리내역 수정
+      <button class="modal-close" onclick="closeModal('modal-edit-progress')">✕</button>
+    </h3>
+    <div class="info-block" id="modal-edit-progress-info"></div>
+    <div class="ig">
+      <label>🎯 고장 부위</label>
+      <div class="zone-grid" id="editp-zone-grid"></div>
+      <input type="hidden" id="editp-zone-val">
+    </div>
+    <div class="ig">
+      <label>🔍 고장 내용</label>
+      <textarea id="editp-fault" rows="2"></textarea>
+    </div>
+    <div class="ig">
+      <label>🔧 수리 내역</label>
+      <textarea id="editp-repair" rows="2"></textarea>
+    </div>
+    <button class="btn btn-blue" onclick="doEditProgress()">💾 저장</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-edit-progress')">취소</button>
+  </div>
+</div>
+
+<!-- 사용부품 확인 모달 (공장장) -->
+<div class="modal-bg" id="modal-parts-confirm">
+  <div class="modal">
+    <h3>🔩 사용부품 확인
+      <button class="modal-close" onclick="closeModal('modal-parts-confirm')">✕</button>
+    </h3>
+    <div class="notice-box nb-blue" style="margin-bottom:10px">탭하면 확인 표시가 켜지고 꺼져요 (승인이 아닌 단순 확인용입니다)</div>
+    <div id="parts-confirm-list"></div>
+    <button class="btn btn-outline" onclick="closeModal('modal-parts-confirm')">닫기</button>
+  </div>
+</div>
+
+<!-- 관리자 설정 패널 (기종/영업팀/전체직원) -->
+<div class="modal-bg" id="modal-settings">
+  <div class="modal">
+    <h3>⚙️ 관리 설정
+      <button class="modal-close" onclick="closeModal('modal-settings')">✕</button>
+    </h3>
+    <div class="card-title" style="margin-top:4px">🚜 기종 관리</div>
+    <div id="settings-types-list" style="margin-bottom:10px"></div>
+    <div class="add-part-row" style="margin-bottom:16px">
+      <input type="text" id="settings-new-type" placeholder="새 기종명">
+      <button onclick="addTypeSetting()">+ 추가</button>
+    </div>
+    <div class="card-title">👥 영업팀 관리</div>
+    <div id="settings-teams-list" style="margin-bottom:10px"></div>
+    <div class="add-part-row" style="margin-bottom:16px">
+      <input type="text" id="settings-new-team" placeholder="새 영업팀 (예: 7팀)">
+      <button onclick="addTeamSetting()">+ 추가</button>
+    </div>
+    <div class="card-title">🧑‍🔧 전체 직원</div>
+    <div id="settings-staff-list"></div>
+    <button class="btn btn-outline" onclick="closeModal('modal-settings')" style="margin-top:10px">닫기</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<footer style="width:100%;text-align:center;padding:16px;font-size:11px;color:var(--gray4);margin-top:auto">
+<footer style="width:100%;text-align:center;padding:20px;font-size:11px;color:var(--gray4);margin-top:auto">
   Made with ❤️ by <strong style="color:var(--green2)">Suneth수나</strong> · 대호주식회사 영업부
 </footer>
 
 <script>
+// ============================================================
+// 대호AS관리 — 메인 스크립트
+// 작성: Suneth수나 | 공식출시: 2026-08-01
+// ============================================================
+
+// ── API & 접근 키 ──
 const API = 'https://script.google.com/macros/s/AKfycbwErQKIOENh4pd2Cu6lamPuRsvyr9VI5i4lgT8JZm658-sza1-ikNCy0tMQxg9hMnNLtw/exec';
+const ACCESS_KEY = new URLSearchParams(location.search).get('k') || '';
 
-const params = new URLSearchParams(location.search);
-const ROLE = params.get('role') || params.get('team') ?
-  (params.get('role') || 'team' + params.get('team')) : 'admin';
-const TEAM = params.get('team') || null;
-
-const ROLE_INFO = {
-  chief: { name: '영업부서장', label: '부서장 화면', tabs: ['in','wait','progress','done','stats'] },
-  admin: { name: 'Suneth (관리자)', label: '관리자 화면', tabs: ['in','wait','progress','done','stats'] },
-  as:    { name: 'AS팀장', label: 'AS팀장 화면', tabs: ['wait','progress','done'] },
-  team1: { name: '1팀 팀장', label: '1팀 입고신청', tabs: ['in','myteam'] },
-  team3: { name: '3팀 팀장', label: '3팀 입고신청', tabs: ['in','myteam'] },
-  team4: { name: '4팀 팀장', label: '4팀 입고신청', tabs: ['in','myteam'] },
-  team5: { name: '5팀 팀장', label: '5팀 입고신청', tabs: ['in','myteam'] },
-  team6: { name: '6팀 팀장', label: '6팀 입고신청', tabs: ['in','myteam'] },
+// ── 접근 키 → 역할 매핑 (고정 9개. 직원 링크는 whoami로 서버 확인) ──
+const KEY_ROLE_MAP = {
+  'dh-chief-9271':   'chief',
+  'dh-factory-4853': 'factory',
+  'dh-admin-7364':   'admin',
+  'dh-as-2918':      'as',
+  'dh-t1-5547':      'team1',
+  'dh-t3-8823':      'team3',
+  'dh-t4-3391':      'team4',
+  'dh-t5-6614':      'team5',
+  'dh-t6-1072':      'team6',
 };
-const roleInfo = ROLE_INFO[ROLE] || ROLE_INFO['admin'];
 
+// ── 역할 정보 ──
+const ROLE_INFO = {
+  chief:    { name:'영업부서장',      label:'부서장 화면',  tabs:['in','wait','progress','done','history','stats'] },
+  factory:  { name:'공장장',          label:'공장장 화면',  tabs:['in','wait','progress','done','history','stats'] },
+  admin:    { name:'Suneth (관리자)', label:'관리자 화면',  tabs:['in','wait','progress','done','history','stats'] },
+  as:       { name:'AS팀장',          label:'AS팀장 화면',  tabs:['wait','progress','done','history'] },
+  team1:    { name:'1팀 팀장',        label:'1팀 입고신청', tabs:['in','myteam','history'] },
+  team3:    { name:'3팀 팀장',        label:'3팀 입고신청', tabs:['in','myteam','history'] },
+  team4:    { name:'4팀 팀장',        label:'4팀 입고신청', tabs:['in','myteam','history'] },
+  team5:    { name:'5팀 팀장',        label:'5팀 입고신청', tabs:['in','myteam','history'] },
+  team6:    { name:'6팀 팀장',        label:'6팀 입고신청', tabs:['in','myteam','history'] },
+  employee: { name:'직원',            label:'직원 화면',    tabs:['in','myteam','history'] },
+};
+
+// ── 팀 역할 → 팀 이름 ──
+const TEAM_MAP = { team1:'1팀', team3:'3팀', team4:'4팀', team5:'5팀', team6:'6팀' };
+
+// ── 고장 부위 목록 ──
+const FAULT_ZONES = ['기어박스','입력축','칼축','칼날','체인','벨트','오일씰','베어링','볼트/너트','기타'];
+
+// ── 전역 상태 ──
+let ROLE = '';
+let TEAM = '';
+let MY_NAME = '';
+let IS_STAFF = false;
 let allData = [];
 let currentSerial = '';
 let usedParts = [];
 let checkinParts = [];
+let missingParts = [];
 let currentFilter = 'all';
+let currentHistoryFilter = 'all';
+let qrScanner = null;
+let _toastTimer = null;
+let TYPES_LIST = ['로터 베이터'];
+let TEAMS_LIST = ['1팀','3팀','4팀','5팀','6팀'];
+let staffList = [];
+let usedPartsAll = [];
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('role-name').textContent = roleInfo.name;
-  document.getElementById('role-label').textContent = roleInfo.label;
+// ============================================================
+// 초기화
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!ACCESS_KEY) { showNoAccess(); return; }
+
+  // 1) 고정 키면 즉시 확인, 아니면 서버에 whoami로 직원 링크 검증
+  let resolvedRole = KEY_ROLE_MAP[ACCESS_KEY];
+  let resolvedName = '';
+  if (!resolvedRole) {
+    try {
+      const res  = await fetch(`${API}?action=whoami&k=${ACCESS_KEY}`);
+      const json = await res.json();
+      if (!json.success) { showNoAccess(); return; }
+      resolvedRole = json.role;
+      TEAM = json.team || '';
+      resolvedName = json.name || '';
+      IS_STAFF = !!json.isStaff;
+    } catch(e) { showNoAccess(); return; }
+  }
+
+  if (!resolvedRole || !ROLE_INFO[resolvedRole]) { showNoAccess(); return; }
+
+  ROLE = resolvedRole;
+  TEAM = TEAM || TEAM_MAP[ROLE] || '';
+
+  const info = ROLE_INFO[ROLE];
+  MY_NAME = resolvedName || info.name;
+  document.getElementById('role-name').textContent = MY_NAME;
+  document.getElementById('role-label').textContent = TEAM ? `${TEAM} · ${info.label}` : info.label;
+
+  // PWA: 홈화면 추가 시 각자 링크로 실행되게
+  updateManifest();
+
+  // 관리자급은 설정(기종/영업팀) 버튼 노출
+  if (isAdminLike() || isTeamRole()) showSettingsGear();
+
+  // 동적 설정값 로드 (기종/영업팀 목록)
+  await loadSettings();
+
+  // 탭 생성
   buildTabs();
-  loadData();
+
+  // 데이터 로드
+  await loadData();
 });
 
+function isAdminLike() { return ROLE==='admin'||ROLE==='chief'||ROLE==='factory'; }
+function isTeamRole()  { return ROLE.startsWith('team') || ROLE==='employee'; }
+
+async function loadSettings() {
+  try {
+    const res  = await fetch(`${API}?action=getSettings&k=${ACCESS_KEY}`);
+    const json = await res.json();
+    if (json.success) {
+      if (json.types?.length) TYPES_LIST = json.types;
+      if (json.teams?.length) TEAMS_LIST = json.teams;
+    }
+  } catch(e) { /* 기본값 사용 */ }
+}
+
+function showSettingsGear() {
+  const chip = document.querySelector('.role-chip');
+  if (!chip) return;
+  const btn = document.createElement('button');
+  btn.textContent = '⚙️';
+  btn.style.cssText = 'background:none;border:none;color:white;font-size:15px;cursor:pointer;margin-left:6px;padding:0';
+  btn.onclick = openSettingsPanel;
+  chip.appendChild(btn);
+}
+
+// PWA manifest 동적 업데이트
+function updateManifest() {
+  try {
+    const data = {
+      name:'대호AS관리', short_name:'대호AS',
+      start_url: `/daeho-as/?k=${ACCESS_KEY}`,
+      display:'standalone', background_color:'#1B5E20', theme_color:'#1B5E20',
+      icons:[
+        { src:'icon-192.png', sizes:'192x192', type:'image/png' },
+        { src:'icon-512.png', sizes:'512x512', type:'image/png' }
+      ]
+    };
+    const blob = new Blob([JSON.stringify(data)], { type:'application/json' });
+    document.querySelector('link[rel="manifest"]').href = URL.createObjectURL(blob);
+  } catch(e) { /* 무시 */ }
+}
+
+// 접근 불가 화면
+function showNoAccess() {
+  document.getElementById('role-name').textContent = '접근 불가';
+  document.getElementById('role-label').textContent = '권한 없음';
+  document.getElementById('tab-bar').style.display = 'none';
+  document.getElementById('main-content').innerHTML = `
+    <div class="no-access">
+      <div class="icon">🔒</div>
+      <h2>접근 권한이 없습니다</h2>
+      <p>올바른 링크로 접속해주세요.<br>링크를 모르시면<br>담당자(Suneth)에게 문의하세요.</p>
+    </div>`;
+}
+
+// ============================================================
+// 탭 생성 & 전환
+// ============================================================
 function buildTabs() {
-  const tabDefs = {
-    in:       { icon:'📥', label:'입고' + (ROLE==='admin'||ROLE==='chief' ? '' : '신청') },
+  const defs = {
+    in:       { icon:'📥', label: (ROLE==='admin'||ROLE==='chief'||ROLE==='factory') ? '입고' : '신청' },
     wait:     { icon:'⏳', label:'AS대기' },
     progress: { icon:'🔧', label:'진행중' },
     done:     { icon:'✅', label:'완료' },
+    history:  { icon:'📜', label:'전체이력' },
     stats:    { icon:'📊', label:'통계' },
     myteam:   { icon:'👀', label:'우리팀' },
   };
   const bar = document.getElementById('tab-bar');
   bar.innerHTML = '';
-  roleInfo.tabs.forEach((t, i) => {
-    const d = tabDefs[t];
+  ROLE_INFO[ROLE].tabs.forEach((t, i) => {
+    const d = defs[t];
     const div = document.createElement('div');
-    div.className = 'tab' + (i===0?' active':'');
+    div.className = 'tab' + (i===0 ? ' active' : '');
     div.dataset.tab = t;
     div.innerHTML = `<span class="tab-icon">${d.icon}</span>${d.label}`;
     div.onclick = () => switchTab(t);
@@ -337,202 +708,390 @@ function buildTabs() {
 }
 
 function switchTab(t) {
+  // QR 스캔 중이면 중지
+  if (qrScanner) stopQR();
   document.querySelectorAll('.tab').forEach(tb => tb.classList.remove('active'));
   document.querySelector(`.tab[data-tab="${t}"]`)?.classList.add('active');
   renderScreen(t);
 }
 
-async function loadData() {
-  try {
-    const res = await fetch(API + '?action=getAll');
-    const json = await res.json();
-    if (json.success) {
-      allData = json.data;
-      updateBadges();
-      renderScreen(roleInfo.tabs[0]);
-    } else showToast('데이터 로드 실패: ' + json.error, 'err');
-  } catch(e) {
-    showToast('연결 오류: ' + e.message, 'err');
-  }
-}
-
+// 배지 업데이트
 function updateBadges() {
-  const wait = allData.filter(r => r['상태']==='신청'||r['상태']==='대기').length;
-  const prog = allData.filter(r => r['상태']==='AS중').length;
-  const waitTab = document.querySelector('.tab[data-tab="wait"]');
-  const progTab = document.querySelector('.tab[data-tab="progress"]');
-  if (waitTab) {
-    let b = waitTab.querySelector('.nbadge') || document.createElement('span');
-    if (wait > 0) { b.className='nbadge'; b.textContent=wait; waitTab.appendChild(b); }
-    else b.remove?.();
-  }
-  if (progTab) {
-    let b = progTab.querySelector('.nbadge') || document.createElement('span');
-    if (prog > 0) { b.className='nbadge blue'; b.textContent=prog; progTab.appendChild(b); }
-    else b.remove?.();
+  const myData = TEAM ? allData.filter(r => r['영업팀']===TEAM) : allData;
+  const reqCount  = myData.filter(r => r['상태']==='신청').length;
+  const waitCount = myData.filter(r => r['상태']==='대기').length;
+  const progCount = myData.filter(r => r['상태']==='AS중').length;
+
+  // AS대기 탭 배지 - 역할에 따라 다르게
+  let waitBadge = 0;
+  if (ROLE==='as') waitBadge = waitCount;
+  else waitBadge = reqCount + waitCount;
+
+  setBadge('wait', waitBadge);
+  setBadge('progress', progCount, 'blue');
+}
+
+function setBadge(tabId, count, cls='') {
+  const tab = document.querySelector(`.tab[data-tab="${tabId}"]`);
+  if (!tab) return;
+  let b = tab.querySelector('.nbadge');
+  if (count > 0) {
+    if (!b) { b = document.createElement('span'); tab.appendChild(b); }
+    b.className = 'nbadge' + (cls ? ' '+cls : '');
+    b.textContent = count > 99 ? '99+' : count;
+  } else {
+    if (b) b.remove();
   }
 }
 
+// ============================================================
+// 화면 렌더링
+// ============================================================
 function renderScreen(tab) {
   const c = document.getElementById('main-content');
-  if (tab==='in')            c.innerHTML = renderIn();
-  else if (tab==='wait')     c.innerHTML = renderWait();
-  else if (tab==='progress') c.innerHTML = renderProgress();
-  else if (tab==='done')     c.innerHTML = renderDone();
-  else if (tab==='stats')    c.innerHTML = renderStats();
-  else if (tab==='myteam')   c.innerHTML = renderMyTeam();
+  switch(tab) {
+    case 'in':       c.innerHTML = renderIn();       break;
+    case 'wait':     c.innerHTML = renderWait();     break;
+    case 'progress': c.innerHTML = renderProgress(); break;
+    case 'done':     c.innerHTML = renderDone();     break;
+    case 'history':  c.innerHTML = renderHistory();  break;
+    case 'stats':    c.innerHTML = renderStats();    break;
+    case 'myteam':   c.innerHTML = renderMyTeam();   loadStaffList().then(renderMyTeamStaffSection); break;
+    default:         c.innerHTML = '<div class="empty"><div class="empty-icon">🚧</div><p>준비 중</p></div>';
+  }
 }
 
+// ── 입고 / 신청 화면 ──
 function renderIn() {
-  const isTeam = ROLE.startsWith('team');
-  const isChief = ROLE === 'chief';
+  const isTeam  = ROLE.startsWith('team') || ROLE==='employee';
+  const isAdmin = ROLE === 'admin';
+  const isChief = ROLE === 'chief' || ROLE === 'factory';
+
   return `
+  <!-- 기계 이력 조회 -->
   <div class="card">
     <div class="card-title">🔍 기계 이력 조회</div>
     <div style="display:flex;gap:8px">
-      <input type="text" id="search-serial" placeholder="제조번호 입력 (예: 6R3-0192)" style="flex:1;padding:10px 13px;border:1.5px solid #E0E0E0;border-radius:10px;font-size:14px;font-family:inherit;outline:none">
-      <button onclick="doSearch()" style="padding:10px 16px;background:var(--blue2);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">조회</button>
+      <input type="text" id="search-serial"
+        placeholder="제조번호 입력 (예: 6R3-0192)"
+        style="flex:1;padding:10px 13px;border:1.5px solid #E0E0E0;border-radius:10px;font-size:14px;font-family:inherit;outline:none"
+        oninput="formatSerial(this)"
+        onkeydown="if(event.key==='Enter')doSearch()">
+      <button onclick="doSearch()"
+        style="padding:10px 16px;background:var(--blue2);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">
+        조회
+      </button>
     </div>
     <div id="history-result"></div>
   </div>
+
+  <!-- 입고 등록 / 신청 폼 -->
   <div class="card">
     <div class="card-title">${isTeam ? '📋 입고 신청' : '📥 신규 입고 등록'}</div>
-    ${!isTeam ? `<div class="qr-box" onclick="showToast('📷 카메라 기능은 실제 배포 후 사용 가능해요')"><div class="qr-icon">▦</div><p>QR 코드 스캔</p><small>제조번호 자동 입력</small></div><div class="divider">또는 직접 입력</div>` : ''}
-    <div class="ig"><label>제조번호</label><input type="text" id="in-serial" placeholder="예: 6R3-0192" style="text-transform:uppercase"></div>
+
+    <!-- QR 스캔 (관리자만) -->
+    ${isAdmin ? `
+    <div class="qr-box" id="qr-trigger" onclick="startQR()">
+      <div class="qr-icon">📷</div>
+      <p style="font-size:13px;color:var(--gray3);font-weight:500">QR 코드 스캔</p>
+      <small style="font-size:11px;color:var(--gray4)">탭하면 카메라 실행</small>
+    </div>
+    <div id="qr-reader" style="display:none"></div>
+    <button id="qr-stop-btn" onclick="stopQR()"
+      style="display:none;width:100%;padding:10px;background:var(--red3);color:var(--red2);border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px">
+      ⏹ 스캔 중지
+    </button>
+    <div class="divider">또는 직접 입력</div>` : ''}
+
+    <!-- 제조번호 -->
+    <div class="ig">
+      <label>제조번호 <span style="color:var(--red2)">*</span></label>
+      <input type="text" id="in-serial"
+        placeholder="예: 6R3-0192"
+        oninput="formatSerial(this)"
+        onblur="autoFillFromSerial(this.value)">
+    </div>
+
+    <!-- 기종명 + 형식명 -->
     <div class="row">
-      <div class="ig"><label>기종명</label><input type="text" id="in-model" value="로터 베이터" readonly style="background:#F5F5F5;color:#757575;cursor:not-allowed"></div>
-      <div class="ig"><label>형식명</label>
+      <div class="ig">
+        <label>기종명</label>
+        <select id="in-model">${TYPES_LIST.map(t=>`<option>${esc(t)}</option>`).join('')}</select>
+      </div>
+      <div class="ig">
+        <label>형식명 <span style="color:var(--red2)">*</span></label>
         <select id="in-type" onchange="loadParts()">
           <option value="">선택</option>
           <option>TR36</option><option>TR40</option><option>TR45</option><option>TR50</option>
         </select>
       </div>
     </div>
-    ${isTeam ? '' : `<div class="ig"><label>영업팀</label><select id="in-team"><option value="">선택</option><option>1팀</option><option>3팀</option><option>4팀</option><option>5팀</option><option>6팀</option></select></div>`}
-    <div class="ig"><label>수요자명 <span class="opt">(선택)</span></label><input type="text" id="in-customer" placeholder="홍길동"></div>
-    ${isChief ? `<div class="ig" style="background:var(--red3);border-radius:10px;padding:10px"><label style="color:var(--red2)">🚨 긴급 AS (부서장 전용)</label><label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:6px"><input type="checkbox" id="in-urgent" style="width:20px;height:20px;accent-color:var(--red2)"><span style="font-size:14px;font-weight:600;color:var(--red2)">긴급으로 신청</span></label></div>` : ''}
-    <div class="ig" id="parts-section" style="display:none">
-      <label>📦 부품 체크 <span class="opt">(팀장 신청시 체크 — Suneth가 하차때 2차확인)</span></label>
-      <div class="parts-box" id="parts-list"><div style="text-align:center;color:var(--gray4);font-size:12px;padding:10px">형식명 선택 후 표시됩니다</div></div>
-      <div class="add-part-row"><input type="text" id="new-part-input" placeholder="새 부품 추가"><button onclick="addNewPart()">+ 추가</button></div>
+
+    <!-- 영업팀 (팀장은 자동) -->
+    ${!isTeam ? `
+    <div class="ig">
+      <label>영업팀</label>
+      <select id="in-team">
+        <option value="">선택</option>
+        ${TEAMS_LIST.map(t=>`<option>${esc(t)}</option>`).join('')}
+      </select>
+    </div>` : ''}
+
+    <!-- 지역 -->
+    <div class="ig">
+      <label>지역 <span class="opt">(선택)</span></label>
+      <input type="text" id="in-region" placeholder="예: 전남 나주시">
     </div>
-    <div class="ig"><label>📝 메모 <span class="opt">(선택)</span></label><textarea id="in-memo" rows="2" placeholder="보증기간 내 / 재발 AS / 특이사항 등"></textarea></div>
-    <button class="btn btn-green" onclick="doRegister()">${isTeam ? '📋 입고 신청하기' : '📥 입고 등록'}</button>
+
+    <!-- 수요자명 -->
+    <div class="ig">
+      <label>수요자명 <span class="opt">(선택 — 제조번호 입력 시 자동완성)</span></label>
+      <input type="text" id="in-customer" placeholder="홍길동">
+    </div>
+
+    <!-- 긴급 (부서장/공장장만) -->
+    ${isChief ? `
+    <div class="ig" style="background:var(--red3);border-radius:10px;padding:12px">
+      <label style="color:var(--red2);margin-bottom:8px;display:block">🚨 긴급 AS (부서장/공장장 전용)</label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+        <input type="checkbox" id="in-urgent"
+          style="width:22px;height:22px;accent-color:var(--red2);cursor:pointer">
+        <span style="font-size:14px;font-weight:600;color:var(--red2)">긴급으로 신청</span>
+      </label>
+    </div>` : ''}
+
+    <!-- 부품 체크 (형식명 선택 후 표시) -->
+    <div id="parts-section" style="display:none">
+      <div class="ig">
+        <label>📦 부품 체크 <span class="opt">(있으면 ✓, 없으면 빈칸)</span></label>
+        <div class="parts-box" id="parts-list">
+          <div style="color:var(--gray4);font-size:12px;padding:10px;text-align:center">불러오는 중...</div>
+        </div>
+        <div class="add-part-row">
+          <input type="text" id="new-part-input" placeholder="새 부품 추가 (예: 조인트)">
+          <button onclick="addNewPart()">+ 추가</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 메모 -->
+    <div class="ig">
+      <label>📝 메모 <span class="opt">(선택)</span></label>
+      <textarea id="in-memo" rows="2" placeholder="보증기간 내 / 재발 AS / 기타 특이사항"></textarea>
+    </div>
+
+    <button class="btn btn-green" onclick="doRegister()">
+      ${isTeam ? '📋 입고 신청하기' : '📥 입고 등록'}
+    </button>
   </div>`;
 }
 
+// ── AS대기 화면 ──
 function renderWait() {
-  const filtered = filterByRole(allData.filter(r => {
-  if (ROLE==='admin'||ROLE==='chief') return r['상태']==='신청';
-  if (ROLE==='as') return r['상태']==='대기';
-  return r['상태']==='신청'||r['상태']==='대기';
-}));
+  let filtered;
+  if (ROLE==='admin' || ROLE==='chief' || ROLE==='factory') {
+    // 관리자/부서장: 신청 상태만 (입고 확정 필요)
+    filtered = allData.filter(r => r['상태']==='신청');
+  } else if (ROLE==='as') {
+    // AS팀장: 대기 상태만 (AS 시작 필요)
+    filtered = allData.filter(r => r['상태']==='대기');
+  } else {
+    // 영업팀장: 자기 팀 신청+대기
+    filtered = allData.filter(r =>
+      (r['상태']==='신청' || r['상태']==='대기') && r['영업팀']===TEAM
+    );
+  }
+
   const urgent = filtered.filter(r => r['긴급여부']==='Y');
   const normal = filtered.filter(r => r['긴급여부']!=='Y');
+
   let html = '';
+
+  if (ROLE==='admin'||ROLE==='chief'||ROLE==='factory') {
+    html += `<div class="notice-box nb-blue" style="margin-bottom:12px">📥 입고 확정이 필요한 신청 건입니다</div>`;
+  } else if (ROLE==='as') {
+    html += `<div class="notice-box nb-blue" style="margin-bottom:12px">🔧 AS 시작 대기 중인 기계입니다</div>`;
+  }
+
   if (urgent.length) {
-    html += `<div class="alert-banner">🚨 긴급 AS ${urgent.length}건 대기 중</div>`;
-    html += `<div class="sec-label">🚨 긴급 · ${urgent.length}건</div>`;
-    urgent.forEach(r => html += listItem(r, true));
+    html += `<div class="alert-banner">🚨 긴급 AS ${urgent.length}건!</div>`;
+    html += `<div class="sec-label">🚨 긴급</div>`;
+    urgent.forEach(r => { html += listItem(r, true); });
   }
   if (normal.length) {
-    html += `<div class="sec-label" style="margin-top:${urgent.length?'10px':'0'}">대기 · ${normal.length}건</div>`;
-    normal.forEach((r,i) => html += listItem(r, false, i+1));
+    html += `<div class="sec-label" style="margin-top:${urgent.length?'12px':'0'}">대기 · ${normal.length}건</div>`;
+    normal.forEach((r, i) => { html += listItem(r, false, i+1); });
   }
-  if (!filtered.length) html = `<div class="empty"><div class="empty-icon">✅</div><p>대기 중인 기계가 없어요</p></div>`;
+  if (!filtered.length) {
+    html = `<div class="empty"><div class="empty-icon">✅</div><p>대기 중인 기계가 없어요</p></div>`;
+  }
   return html;
 }
 
+// ── 진행중 화면 ──
 function renderProgress() {
-  const list = filterByRole(allData.filter(r => r['상태']==='AS중'));
-  if (!list.length) return `<div class="empty"><div class="empty-icon">🔧</div><p>진행 중인 AS가 없어요</p></div>`;
+  let list = allData.filter(r => r['상태']==='AS중');
+  if (TEAM) list = list.filter(r => r['영업팀']===TEAM);
+
+  if (!list.length) {
+    return `<div class="empty"><div class="empty-icon">🔧</div><p>진행 중인 AS가 없어요</p></div>`;
+  }
+
   return list.map(r => `
   <div class="card">
-    <div style="background:linear-gradient(135deg,var(--blue2),#1976D2);color:white;border-radius:10px;padding:14px;margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div>
-          <div style="font-size:18px;font-weight:900">${r['기종명']||''} ${r['형식명']||''}</div>
-          <div style="font-size:12px;opacity:.8;margin-top:3px">🔖 ${r['제조번호']} · ${r['영업팀']||''}${r['수요자명']?' · '+r['수요자명']:''}</div>
-          ${r['긴급여부']==='Y'?'<span class="urgent-tag" style="margin-top:6px;display:inline-block">🚨 긴급</span>':''}
+    <!-- 기계 정보 헤더 -->
+    <div style="background:linear-gradient(135deg,var(--blue2),#1976D2);color:white;border-radius:12px;padding:16px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:18px;font-weight:900">${esc(r['기종명'])} ${esc(r['형식명'])}</div>
+          <div style="font-size:12px;opacity:.8;margin-top:3px">
+            🔖 ${esc(r['제조번호'])}${r['영업팀']?' · '+esc(r['영업팀']):''}${r['수요자명']?' · '+esc(r['수요자명']):''}
+          </div>
+          ${r['긴급여부']==='Y' ? '<span class="urgent-tag" style="margin-top:6px;display:inline-flex">🚨 긴급</span>' : ''}
         </div>
-        <span class="status s-ing">AS중</span>
+        <span class="status s-ing" style="flex-shrink:0">AS중</span>
       </div>
-      <div style="display:flex;gap:14px;margin-top:10px;flex-wrap:wrap">
-        <div style="font-size:11px;opacity:.85"><strong style="display:block">입고</strong>${formatDate(r['입고일시'])}</div>
-        <div style="font-size:11px;opacity:.85"><strong style="display:block">AS시작</strong>${formatDate(r['AS시작일시'])}</div>
-        ${r['담당팀장']?`<div style="font-size:11px;opacity:.85"><strong style="display:block">담당</strong>${r['담당팀장']}</div>`:''}
+      <div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap">
+        <div style="font-size:11px;opacity:.85"><strong style="display:block;margin-bottom:2px">입고</strong>${formatDate(r['입고일시'])}</div>
+        <div style="font-size:11px;opacity:.85"><strong style="display:block;margin-bottom:2px">AS시작</strong>${formatDate(r['AS시작일시'])}</div>
+        ${r['담당팀장']?`<div style="font-size:11px;opacity:.85"><strong style="display:block;margin-bottom:2px">담당</strong>${esc(r['담당팀장'])}</div>`:''}
+        ${r['고장부위']?`<div style="font-size:11px;opacity:.85"><strong style="display:block;margin-bottom:2px">부위</strong>${esc(r['고장부위'])}</div>`:''}
       </div>
     </div>
-    ${r['메모']?`<div style="background:var(--gold2);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:12px;color:var(--gold)">📝 ${r['메모']}</div>`:''}
-    ${ROLE==='as'?`<button class="btn btn-blue" onclick="openComplete('${r['제조번호']}')">✅ AS 완료 처리</button>`:`<div style="font-size:12px;color:var(--gray3);text-align:center;padding:8px">AS팀장이 완료 처리합니다</div>`}
+
+    ${r['메모'] ? `<div class="notice-box nb-yellow" style="margin-bottom:10px">📝 ${esc(r['메모'])}</div>` : ''}
+    ${r['입고부품체크'] ? `<div style="background:var(--orange3);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:12px;color:var(--orange2)">📦 입고 부품: ${esc(r['입고부품체크'])}</div>` : ''}
+
+    <!-- 버튼 -->
+    ${ROLE==='as' ? `
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-sm p" style="flex:0 0 auto" onclick="openMissing('${esc(r['제조번호'])}')">📝 누락정보</button>
+      <button class="btn-sm b" style="flex:0 0 auto" onclick="openEditProgress('${esc(r['제조번호'])}')">✏️ 수리내역 수정</button>
+      <button class="btn btn-blue" style="flex:1;margin-bottom:0" onclick="openComplete('${esc(r['제조번호'])}')">✅ AS 완료 처리</button>
+    </div>` :
+    (ROLE==='factory' ? `
+    <button class="btn btn-outline" onclick="openPartsConfirm('${esc(r['제조번호'])}')">🔩 사용부품 확인</button>` :
+    `<div style="font-size:12px;color:var(--gray3);text-align:center;padding:8px">AS팀장이 완료 처리합니다</div>`)}
   </div>`).join('');
 }
 
+// ── 완료/출고 화면 ──
 function renderDone() {
-  const done = filterByRole(allData.filter(r => r['상태']==='완료'));
-  const out  = filterByRole(allData.filter(r => r['상태']==='출고')).slice(0,5);
+  let done = allData.filter(r => r['상태']==='완료');
+  let out  = allData.filter(r => r['상태']==='출고');
+  if (TEAM) { done = done.filter(r => r['영업팀']===TEAM); out = out.filter(r => r['영업팀']===TEAM); }
+
+  // 날짜 필터
+  if (currentFilter !== 'all') {
+    const now = new Date();
+    done = done.filter(r => {
+      const d = new Date(r['완료일시']);
+      if (isNaN(d)) return true;
+      if (currentFilter==='week') {
+        const sow = new Date(now); sow.setDate(now.getDate()-now.getDay()); sow.setHours(0,0,0,0);
+        return d >= sow;
+      }
+      if (currentFilter==='month') {
+        return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+      }
+      return true;
+    });
+  }
+
+  out = out.slice(0, 5);
+  const isAdminLike = ROLE==='admin'||ROLE==='chief'||ROLE==='factory';
+
   let html = `
   <div class="filter-row">
-    <button class="filter-btn ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">전체</button>
-    <button class="filter-btn ${currentFilter==='week'?'active':''}" onclick="setFilter('week')">이번주</button>
+    <button class="filter-btn ${currentFilter==='all'  ?'active':''}" onclick="setFilter('all')">전체</button>
+    <button class="filter-btn ${currentFilter==='week' ?'active':''}" onclick="setFilter('week')">이번주</button>
     <button class="filter-btn ${currentFilter==='month'?'active':''}" onclick="setFilter('month')">이번달</button>
   </div>
   <div style="display:flex;gap:8px;margin-bottom:12px">
-    <input type="text" id="done-search" placeholder="🔍 제조번호 검색" style="flex:1;padding:10px 13px;border:1.5px solid #E0E0E0;border-radius:10px;font-size:13px;font-family:inherit;outline:none">
-    <button onclick="filterDone()" style="padding:10px 14px;background:var(--green2);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">검색</button>
+    <input type="text" id="done-search"
+      placeholder="🔍 제조번호 또는 수요자명 검색"
+      style="flex:1;padding:10px 13px;border:1.5px solid #E0E0E0;border-radius:10px;font-size:13px;font-family:inherit;outline:none"
+      onkeydown="if(event.key==='Enter')searchDone()">
+    <button onclick="searchDone()"
+      style="padding:10px 14px;background:var(--green2);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
+      검색
+    </button>
   </div>`;
+
   if (done.length) {
     html += `<div class="sec-label">출고 대기 · ${done.length}건</div>`;
     done.forEach(r => {
       html += `
       <div class="card" style="margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-          <div>
-            <div style="font-size:14px;font-weight:700">${r['기종명']||''} ${r['형식명']||''}</div>
-            <div style="font-size:11px;color:var(--gray3);margin-top:2px">🔖 ${r['제조번호']}${r['영업팀']?' · '+r['영업팀']:''}${r['수요자명']?' · '+r['수요자명']:''}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:700">${esc(r['기종명'])} ${esc(r['형식명'])}</div>
+            <div style="font-size:11px;color:var(--gray3);margin-top:2px">
+              🔖 ${esc(r['제조번호'])}${r['영업팀']?' · '+esc(r['영업팀']):''}${r['수요자명']?' · '+esc(r['수요자명']):''}
+            </div>
           </div>
-          <span class="status s-done">완료</span>
+          <span class="status s-done" style="flex-shrink:0">완료</span>
         </div>
-        ${r['수리내역']?`<div style="font-size:12px;color:var(--gray2);margin-bottom:8px">🔧 ${r['수리내역']}</div>`:''}
-        ${r['입고부품체크']?`<div style="background:var(--orange3);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:12px;color:var(--orange2)">📦 입고부품: ${r['입고부품체크']}</div>`:''}
-        <div style="display:flex;justify-content:space-between;align-items:center">
+        ${r['고장부위']?`<span class="zone-tag" style="margin-bottom:6px;display:inline-block">🎯 ${esc(r['고장부위'])}</span>`:''}
+        ${r['수리내역']?`<div style="font-size:12px;color:var(--gray2);margin-bottom:8px">🔧 ${esc(r['수리내역'])}</div>`:''}
+        ${r['입고부품체크']?`<div style="background:var(--orange3);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:12px;color:var(--orange2)">📦 입고부품: ${esc(r['입고부품체크'])}</div>`:''}
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
           <span style="font-size:11px;color:var(--gray3)">완료: ${formatDate(r['완료일시'])}</span>
           <div style="display:flex;gap:6px">
-            ${ROLE==='admin'||ROLE==='chief'?`<button class="btn-sm o" onclick="openOut('${r['제조번호']}')">📤 출고 처리</button>`:''}
-            ${ROLE==='chief'?`<button class="btn-sm r" onclick="openForce('${r['제조번호']}')">⚡ 강제변경</button>`:''}
+            ${isAdminLike?`<button class="btn-sm o" onclick="openOut('${esc(r['제조번호'])}')">📤 출고</button>`:''}
+            ${(ROLE==='chief'||ROLE==='factory')?`<button class="btn-sm r" onclick="openForce('${esc(r['제조번호'])}')">⚡</button>`:''}
           </div>
         </div>
       </div>`;
     });
   }
+
   if (out.length) {
-    html += `<div class="sec-label" style="margin-top:14px;opacity:.6">최근 출고 완료</div>`;
+    html += `<div class="sec-label" style="margin-top:16px;opacity:.6">최근 출고 완료</div>`;
     out.forEach(r => {
-      html += `<div class="li" style="opacity:.55">
+      html += `
+      <div class="li" style="opacity:.55">
         <div class="li-top">
-          <div><div class="li-model">${r['기종명']||''} ${r['형식명']||''}</div><div class="li-serial">🔖 ${r['제조번호']}${r['영업팀']?' · '+r['영업팀']:''}</div></div>
+          <div>
+            <div class="li-model">${esc(r['기종명'])} ${esc(r['형식명'])}</div>
+            <div class="li-serial">🔖 ${esc(r['제조번호'])}${r['영업팀']?' · '+esc(r['영업팀']):''}</div>
+          </div>
           <span class="status s-out">출고</span>
         </div>
-        <div style="font-size:11px;color:var(--gray3);margin-top:4px">출고: ${formatDate(r['출고일시'])}${r['소요일수']?' · 소요 '+r['소요일수']+'일':''}</div>
+        <div style="font-size:11px;color:var(--gray3);margin-top:4px">
+          출고: ${formatDate(r['출고일시'])}${r['소요일수']?' · 소요 '+r['소요일수']+'일':''}
+        </div>
       </div>`;
     });
   }
-  if (!done.length && !out.length) html += `<div class="empty"><div class="empty-icon">📭</div><p>완료된 AS가 없어요</p></div>`;
+
+  if (!done.length && !out.length) {
+    html += `<div class="empty"><div class="empty-icon">📭</div><p>완료된 AS가 없어요</p></div>`;
+  }
   return html;
 }
 
+// ── 통계 화면 ──
 function renderStats() {
   const total = allData.length;
-  const byStatus={}, byType={}, byTeam={};
+  const byStatus={}, byType={}, byTeam={}, byZone={};
+
   allData.forEach(r => {
-    byStatus[r['상태']]=(byStatus[r['상태']]||0)+1;
-    if(r['형식명']) byType[r['형식명']]=(byType[r['형식명']]||0)+1;
-    if(r['영업팀']) byTeam[r['영업팀']]=(byTeam[r['영업팀']]||0)+1;
+    byStatus[r['상태']] = (byStatus[r['상태']]||0)+1;
+    if (r['형식명'])   byType[r['형식명']]   = (byType[r['형식명']]||0)+1;
+    if (r['영업팀'])   byTeam[r['영업팀']]   = (byTeam[r['영업팀']]||0)+1;
+    if (r['고장부위']) byZone[r['고장부위']] = (byZone[r['고장부위']]||0)+1;
   });
-  const completed=allData.filter(r=>r['소요일수']>0);
-  const avg=completed.length?(completed.reduce((s,r)=>s+Number(r['소요일수']),0)/completed.length).toFixed(1):'-';
-  const maxType=Math.max(...Object.values(byType),1);
-  const maxTeam=Math.max(...Object.values(byTeam),1);
+
+  const completed = allData.filter(r => Number(r['소요일수'])>0);
+  const avg = completed.length
+    ? (completed.reduce((s,r)=>s+Number(r['소요일수']),0)/completed.length).toFixed(1) : '-';
+
+  const maxType = Math.max(...Object.values(byType), 1);
+  const maxTeam = Math.max(...Object.values(byTeam), 1);
+  const maxZone = Math.max(...Object.values(byZone), 1);
+  const typeColors = ['#2E7D32','#43A047','#66BB6A','#A5D6A7'];
+
   return `
   <div class="card">
     <div class="card-title">📊 전체 현황</div>
@@ -540,172 +1099,463 @@ function renderStats() {
       <div class="stat-box g"><div class="stat-num">${total}</div><div class="stat-lbl">총 AS 건수</div></div>
       <div class="stat-box b"><div class="stat-num">${avg}</div><div class="stat-lbl">평균 소요일</div></div>
       <div class="stat-box o"><div class="stat-num">${byStatus['AS중']||0}</div><div class="stat-lbl">진행중</div></div>
-      <div class="stat-box r"><div class="stat-num">${byStatus['대기']||0}</div><div class="stat-lbl">대기중</div></div>
+      <div class="stat-box r"><div class="stat-num">${byStatus['신청']||0}</div><div class="stat-lbl">본사입고전</div></div>
+      <div class="stat-box r"><div class="stat-num">${byStatus['대기']||0}</div><div class="stat-lbl">입고후대기</div></div>
+      <div class="stat-box g"><div class="stat-num">${byStatus['완료']||0}</div><div class="stat-lbl">출고대기</div></div>
     </div>
   </div>
+
+  ${Object.keys(byZone).length ? `
+  <div class="card">
+    <div class="card-title">🎯 고장 부위별 현황</div>
+    ${Object.entries(byZone).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
+    <div class="bar-row">
+      <span class="bar-label">${esc(k)}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxZone*100)}%;background:var(--gold)">${v}건</div></div>
+      <span class="bar-count">${v}</span>
+    </div>`).join('')}
+  </div>` : ''}
+
   <div class="card">
     <div class="card-title">🚜 기종별 현황</div>
-    ${Object.entries(byType).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
-    <div class="bar-row"><span class="bar-label">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxType*100)}%;background:var(--green2)">${v}건</div></div><span class="bar-count">${v}</span></div>`).join('')||'<div style="color:var(--gray4);font-size:12px">데이터 없음</div>'}
+    ${Object.entries(byType).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>`
+    <div class="bar-row">
+      <span class="bar-label">${esc(k)}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxType*100)}%;background:${typeColors[i%4]}">${v}건</div></div>
+      <span class="bar-count">${v}</span>
+    </div>`).join('')||'<div style="color:var(--gray4);font-size:12px">데이터 없음</div>'}
   </div>
+
   <div class="card">
     <div class="card-title">👥 팀별 신청 건수</div>
     ${Object.entries(byTeam).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
-    <div class="bar-row"><span class="bar-label">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxTeam*100)}%;background:var(--blue2)">${k}</div></div><span class="bar-count">${v}</span></div>`).join('')||'<div style="color:var(--gray4);font-size:12px">데이터 없음</div>'}
+    <div class="bar-row">
+      <span class="bar-label">${esc(k)}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxTeam*100)}%;background:var(--blue2)">${esc(k)}</div></div>
+      <span class="bar-count">${v}</span>
+    </div>`).join('')||'<div style="color:var(--gray4);font-size:12px">데이터 없음</div>'}
   </div>
-  ${ROLE==='chief'||ROLE==='admin'?`<button class="btn btn-green" onclick="showToast('📥 구글 시트에서 파일 → 다운로드 → xlsx')">📥 엑셀 다운로드 안내</button>`:''}`;
+
+  ${(ROLE==='chief'||ROLE==='factory'||ROLE==='admin') ? `
+  <button class="btn btn-green" onclick="showToast('📥 구글 시트 → 파일 → 다운로드 → xlsx','ok')">
+    📥 엑셀 다운로드 안내
+  </button>` : ''}`;
 }
 
+// ── 우리팀 화면 (영업팀장) ──
 function renderMyTeam() {
-  const teamName = TEAM ? TEAM+'팀' : '';
-  const list = allData.filter(r => r['영업팀']===teamName);
-  const 신청=list.filter(r=>r['상태']==='신청').length;
-  const 대기=list.filter(r=>r['상태']==='대기').length;
-  const 진행=list.filter(r=>r['상태']==='AS중').length;
-  const 완료=list.filter(r=>r['상태']==='완료').length;
-  const 입고예정=신청+대기;
-  const dates=list.map(r=>r['신청일시']?new Date(r['신청일시']):null).filter(d=>d&&!isNaN(d));
-  const lastUpdate=dates.length?new Date(Math.max(...dates)):null;
+  const list = allData.filter(r => r['영업팀']===TEAM);
+  const 신청 = list.filter(r=>r['상태']==='신청').length;
+  const 대기 = list.filter(r=>r['상태']==='대기').length;
+  const 진행 = list.filter(r=>r['상태']==='AS중').length;
+  const 완료 = list.filter(r=>r['상태']==='완료').length;
+  const dates = list.map(r=>r['신청일시']?new Date(r['신청일시']):null).filter(d=>d&&!isNaN(d));
+  const lastUpdate = dates.length ? new Date(Math.max(...dates)) : null;
+
   return `
-  <div class="card" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);color:white;margin-bottom:12px">
-    <div style="font-size:13px;font-weight:700;opacity:.85;margin-bottom:12px">📊 ${teamName} AS 현황</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:12px;text-align:center">
-        <div style="font-size:28px;font-weight:900">${입고예정}</div>
-        <div style="font-size:11px;opacity:.85;margin-top:2px">📥 입고 예정</div>
+  <div class="card">
+    <div class="card-title">🧑‍🔧 직원 관리</div>
+    <div class="ig">
+      <label>직원 이름 <span style="color:var(--red2)">*</span></label>
+      <input type="text" id="staff-new-name" placeholder="홍길동">
+    </div>
+    <div class="row">
+      <div class="ig">
+        <label>전화번호 <span class="opt">(선택)</span></label>
+        <input type="text" id="staff-new-phone" placeholder="010-0000-0000">
       </div>
-      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:12px;text-align:center">
-        <div style="font-size:28px;font-weight:900">${진행}</div>
-        <div style="font-size:11px;opacity:.85;margin-top:2px">🔧 AS 진행중</div>
+      <div class="ig">
+        <label>지역 <span class="opt">(선택)</span></label>
+        <input type="text" id="staff-new-region" placeholder="예: 광주">
+      </div>
+    </div>
+    <button class="btn btn-blue" onclick="createStaffFromTeam()">🔗 직원 링크 생성</button>
+    <div id="myteam-staff-section" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);color:white">
+    <div style="font-size:13px;font-weight:700;opacity:.85;margin-bottom:14px">📊 ${esc(TEAM)} AS 현황</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:30px;font-weight:900">${신청+대기}</div>
+        <div style="font-size:11px;opacity:.85;margin-top:3px">📥 입고 예정</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:30px;font-weight:900">${진행}</div>
+        <div style="font-size:11px;opacity:.85;margin-top:3px">🔧 AS 진행중</div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px;text-align:center">
-        <div style="font-size:22px;font-weight:900">${완료}</div>
-        <div style="font-size:11px;opacity:.8;margin-top:2px">✅ 완료 대기</div>
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:24px;font-weight:900">${완료}</div>
+        <div style="font-size:11px;opacity:.8;margin-top:3px">✅ 완료 대기</div>
       </div>
-      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px;text-align:center">
-        <div style="font-size:22px;font-weight:900">${list.length}</div>
-        <div style="font-size:11px;opacity:.8;margin-top:2px">📋 전체</div>
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:24px;font-weight:900">${list.length}</div>
+        <div style="font-size:11px;opacity:.8;margin-top:3px">📋 전체</div>
       </div>
     </div>
     <div style="background:rgba(0,0,0,.15);border-radius:8px;padding:8px 12px;font-size:11px;opacity:.9">
-      🕐 마지막 업데이트: ${lastUpdate?formatDate(lastUpdate):'없음'}
+      🕐 마지막 업데이트: ${lastUpdate ? formatDate(lastUpdate) : '없음'}
     </div>
   </div>
+
   ${list.length===0
-    ?`<div class="empty"><div class="empty-icon">📋</div><p>${teamName} AS 내역이 없어요</p></div>`
-    :list.map(r=>`
+    ? `<div class="empty"><div class="empty-icon">📋</div><p>${esc(TEAM)} AS 내역이 없어요</p></div>`
+    : list.map(r=>`
     <div class="card" style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div>
-          <div style="font-size:14px;font-weight:700">${r['기종명']||''} ${r['형식명']||''}</div>
-          <div style="font-size:11px;color:var(--gray3);margin-top:2px">🔖 ${r['제조번호']}${r['수요자명']?' · '+r['수요자명']:''}</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:700">${esc(r['기종명'])} ${esc(r['형식명'])}</div>
+          <div style="font-size:11px;color:var(--gray3);margin-top:2px">
+            🔖 ${esc(r['제조번호'])}${r['수요자명']?' · '+esc(r['수요자명']):''}
+          </div>
         </div>
-        <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
+        <span class="status ${statusClass(r['상태'])}" style="flex-shrink:0">${r['상태']}</span>
       </div>
-      ${r['고장내용']?`<div style="font-size:12px;color:var(--gray2);margin-top:6px">🔍 ${r['고장내용']}</div>`:''}
-      ${r['수리내역']?`<div style="font-size:12px;color:var(--gray2);margin-top:4px">🔧 ${r['수리내역']}</div>`:''}
-      <div style="font-size:11px;color:var(--gray3);margin-top:6px">신청: ${formatDate(r['신청일시'])}</div>
+      ${r['고장부위']?`<span class="zone-tag" style="margin-top:6px;display:inline-block">🎯 ${esc(r['고장부위'])}</span>`:''}
+      ${r['고장내용']?`<div style="font-size:12px;color:var(--gray2);margin-top:6px">🔍 ${esc(r['고장내용'])}</div>`:''}
+      ${r['수리내역']?`<div style="font-size:12px;color:var(--gray2);margin-top:4px">🔧 ${esc(r['수리내역'])}</div>`:''}
+      <div style="font-size:11px;color:var(--gray3);margin-top:8px">신청: ${formatDate(r['신청일시'])}</div>
     </div>`).join('')}`;
 }
 
+// ── 전체이력 화면 ──
+function renderHistory() {
+  let list = TEAM ? allData.filter(r => r['영업팀']===TEAM) : allData.slice();
+
+  // 날짜 필터
+  if (currentHistoryFilter !== 'all') {
+    const now = new Date();
+    list = list.filter(r => {
+      const d = new Date(r['신청일시']);
+      if (isNaN(d)) return true;
+      if (currentHistoryFilter==='week') {
+        const sow = new Date(now); sow.setDate(now.getDate()-now.getDay()); sow.setHours(0,0,0,0);
+        return d >= sow;
+      }
+      if (currentHistoryFilter==='month') {
+        return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+      }
+      return true;
+    });
+  }
+
+  // 최신순 정렬
+  list = list.slice().sort((a,b) => new Date(b['신청일시']||0) - new Date(a['신청일시']||0));
+
+  let html = `
+  <div class="filter-row">
+    <button class="filter-btn ${currentHistoryFilter==='all'  ?'active':''}" onclick="setHistoryFilter('all')">전체</button>
+    <button class="filter-btn ${currentHistoryFilter==='week' ?'active':''}" onclick="setHistoryFilter('week')">이번주</button>
+    <button class="filter-btn ${currentHistoryFilter==='month'?'active':''}" onclick="setHistoryFilter('month')">이번달</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <input type="text" id="history-search"
+      placeholder="🔍 제조번호 또는 수요자명 검색"
+      style="flex:1;padding:10px 13px;border:1.5px solid #E0E0E0;border-radius:10px;font-size:13px;font-family:inherit;outline:none"
+      onkeydown="if(event.key==='Enter')runHistorySearch()">
+    <button onclick="runHistorySearch()"
+      style="padding:10px 14px;background:var(--blue2);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
+      검색
+    </button>
+  </div>
+  <div id="history-list">`;
+
+  html += historyListHTML(list);
+  html += `</div>`;
+  return html;
+}
+
+function historyListHTML(list) {
+  if (!list.length) {
+    return `<div class="empty"><div class="empty-icon">📜</div><p>이력이 없어요</p></div>`;
+  }
+  return `<div class="sec-label">전체 ${list.length}건</div>` + list.map(r => `
+    <div class="li">
+      <div class="li-top">
+        <div>
+          <div class="li-model">${esc(r['기종명']||'')} ${esc(r['형식명']||'')}</div>
+          <div class="li-serial">🔖 ${esc(r['제조번호'])}${r['영업팀']?' · '+esc(r['영업팀']):''}${r['수요자명']?' · '+esc(r['수요자명']):''}</div>
+        </div>
+        <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
+      </div>
+      <div class="li-tags">
+        ${r['긴급여부']==='Y'?`<span class="urgent-tag">🚨 긴급</span>`:''}
+        ${r['고장부위']?`<span class="zone-tag">🎯 ${esc(r['고장부위'])}</span>`:''}
+      </div>
+      ${r['고장내용']?`<div style="font-size:12px;color:var(--gray3);margin-top:6px">🔍 ${esc(r['고장내용'])}</div>`:''}
+      ${r['수리내역']?`<div style="font-size:12px;color:var(--gray3);margin-top:4px">🔧 ${esc(r['수리내역'])}</div>`:''}
+      <div style="font-size:11px;color:var(--gray4);margin-top:6px">신청: ${formatDate(r['신청일시'])}</div>
+    </div>`).join('');
+}
+
+function setHistoryFilter(f) { currentHistoryFilter=f; renderScreen('history'); }
+
+function runHistorySearch() {
+  const q = (document.getElementById('history-search')?.value||'').trim().toUpperCase();
+  let list = TEAM ? allData.filter(r => r['영업팀']===TEAM) : allData.slice();
+  if (q) {
+    list = list.filter(r =>
+      (r['제조번호']||'').toUpperCase().includes(q) || (r['수요자명']||'').toUpperCase().includes(q)
+    );
+  }
+  list = list.slice().sort((a,b) => new Date(b['신청일시']||0) - new Date(a['신청일시']||0));
+  document.getElementById('history-list').innerHTML = historyListHTML(list);
+}
+
+// ── 공통 리스트 아이템 ──
 function listItem(r, isUrgent, num) {
-  const isAdmin = ROLE==='admin'||ROLE==='chief';
+  const isAdminLike = ROLE==='admin'||ROLE==='chief'||ROLE==='factory';
   const isAs = ROLE==='as';
+  const serial = esc(r['제조번호']);
+
   return `
   <div class="li ${isUrgent?'urgent':''}">
     <div class="li-inner">
       ${isUrgent
-        ?`<div class="num-circle" style="background:var(--red3);color:var(--red2);font-size:16px">!</div>`
-        :`<div class="num-circle">${num}</div>`}
-      <div style="flex:1">
+        ? `<div class="num-circle" style="background:var(--red3);color:var(--red2);font-size:18px">!</div>`
+        : `<div class="num-circle">${num}</div>`}
+      <div style="flex:1;min-width:0">
         <div class="li-top">
-          <div>
-            <div class="li-model">${r['기종명']||''} ${r['형식명']||''}</div>
-            <div class="li-serial">🔖 ${r['제조번호']}${r['수요자명']?' · '+r['수요자명']:''}</div>
+          <div style="flex:1;min-width:0">
+            <div class="li-model">${esc(r['기종명'])} ${esc(r['형식명'])}</div>
+            <div class="li-serial">🔖 ${serial}${r['수요자명']?' · '+esc(r['수요자명']):''}</div>
           </div>
           <div class="li-time">${formatDate(r['신청일시'],true)}</div>
         </div>
         <div class="li-tags">
           ${isUrgent?`<span class="urgent-tag">🚨 긴급</span>`:''}
-          ${r['영업팀']?`<span class="team-tag">${r['영업팀']}</span>`:''}
+          ${r['영업팀']?`<span class="team-tag">${esc(r['영업팀'])}</span>`:''}
+          ${r['고장부위']?`<span class="zone-tag">🎯 ${esc(r['고장부위'])}</span>`:''}
           <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
         </div>
-        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
-          ${isAdmin && r['상태']==='신청' ? `<button class="btn-sm g" onclick="openCheckin('${r['제조번호']}')">📥 입고 확정</button>` : ''}
-${isAs && r['상태']==='대기' ? `<button class="btn-sm b" onclick="openStartAS('${r['제조번호']}')">🔧 AS 시작</button>` : ''}
-          ${ROLE==='chief' ? `<button class="btn-sm r" onclick="openForce('${r['제조번호']}')">⚡ 강제변경</button>` : ''}
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+          ${isAdminLike && (r['상태']==='신청'||r['상태']==='대기')
+            ? `<button class="btn-sm g" onclick="openCheckin('${serial}')">📥 입고 확정</button>` : ''}
+          ${isAs && r['상태']==='대기'
+            ? `<button class="btn-sm b" onclick="openStartAS('${serial}')">🔧 AS 시작</button>` : ''}
+          ${isAs
+            ? `<button class="btn-sm p" onclick="openMissing('${serial}')">📝 정보입력</button>` : ''}
+          ${(isAdminLike || isTeamRole()) && (r['상태']==='신청'||r['상태']==='대기')
+            ? `<button class="btn-sm b" onclick="openEditInfo('${serial}')">✏️ 정보수정</button>` : ''}
+          ${(ROLE==='chief'||ROLE==='factory')
+            ? `<button class="btn-sm r" onclick="openForce('${serial}')">⚡ 강제변경</button>` : ''}
         </div>
       </div>
     </div>
   </div>`;
 }
 
-// ══ 액션 함수들 ══
-
-async function doRegister() {
-  const serial = document.getElementById('in-serial')?.value.trim().toUpperCase();
-  const model  = document.getElementById('in-model')?.value.trim();
-  const type   = document.getElementById('in-type')?.value;
-  const team   = TEAM ? TEAM+'팀' : document.getElementById('in-team')?.value;
-  const customer = document.getElementById('in-customer')?.value.trim();
-  const memo   = document.getElementById('in-memo')?.value.trim();
-  const urgent = document.getElementById('in-urgent')?.checked || false;
-  if (!serial) { showToast('제조번호를 입력하세요','err'); return; }
-  if (!type)   { showToast('형식명을 선택하세요','err'); return; }
-  const partChecks = [];
-  document.querySelectorAll('#parts-list .part-item').forEach(item => {
-    const cb = item.querySelector('.part-cb');
-    const name = item.querySelector('.part-name')?.textContent;
-    if (name) partChecks.push(name + (cb?.checked ? '✅' : '☐'));
-  });
-  showToast('⏳ 신청 중...');
-  const res = await postAPI({ action:'register', serial, model, type, team, customer, memo, urgent, role:ROLE, parts:partChecks.join(' / ') });
-  if (res.success) { showToast('✅ ' + res.message); document.getElementById('in-serial').value=''; loadData(); }
-  else showToast('❌ ' + res.error, 'err');
+// ============================================================
+// 데이터 로드
+// ============================================================
+async function loadData() {
+  try {
+    const res  = await fetch(`${API}?action=getAll&k=${ACCESS_KEY}`);
+    const json = await res.json();
+    if (json.error) { showToast('⚠️ ' + json.error, 'err'); return; }
+    if (json.success) {
+      allData = json.data || [];
+      updateBadges();
+      const activeTab = document.querySelector('.tab.active');
+      if (activeTab) renderScreen(activeTab.dataset.tab);
+      else renderScreen(ROLE_INFO[ROLE].tabs[0]);
+    }
+  } catch(e) {
+    showToast('연결 오류: ' + e.message, 'err');
+  }
 }
 
-// 입고확정 모달 열기
-function openCheckin(serial) {
-  currentSerial = serial;
-  checkinParts = [];
-  const r = allData.find(d => d['제조번호']===serial);
-  document.getElementById('modal-checkin-info').innerHTML = `
-    <div class="ib-row"><span class="ib-label">기계</span><span class="ib-val">${r?.['기종명']||''} ${r?.['형식명']||''}</span></div>
-    <div class="ib-row"><span class="ib-label">제조번호</span><span class="ib-val">${serial}</span></div>
-    <div class="ib-row"><span class="ib-label">영업팀</span><span class="ib-val">${r?.['영업팀']||'-'}</span></div>
-    <div class="ib-row"><span class="ib-label">수요자</span><span class="ib-val">${r?.['수요자명']||'-'}</span></div>`;
+// ============================================================
+// QR 스캔
+// ============================================================
+async function startQR() {
+  if (qrScanner) { stopQR(); return; }
 
-  // 팀장 체크 내역 있으면 표시 + 기본값으로 세팅
-  // 신청시 저장된 부품(입고부품체크) 또는 메모에서 읽기
-const teamParts = r?.['입고부품체크'] || r?.['메모'];
-  const teamSection = document.getElementById('checkin-team-section');
-  if (teamParts && teamParts.trim()) {
-    teamSection.style.display = 'block';
-    document.getElementById('checkin-team-content').textContent = teamParts;
-    checkinParts = teamParts.split(' / ').map(p => ({
-      name: p.replace('✅','').replace('☐','').trim(),
-      checked: p.includes('✅')
-    })).filter(p => p.name);
-  } else {
-    teamSection.style.display = 'none';
-    checkinParts = [];
+  const readerEl  = document.getElementById('qr-reader');
+  const triggerEl = document.getElementById('qr-trigger');
+  const stopBtn   = document.getElementById('qr-stop-btn');
+  if (!readerEl) return;
+
+  readerEl.style.display = 'block';
+  if (triggerEl) triggerEl.style.display = 'none';
+  if (stopBtn)   stopBtn.style.display = 'block';
+
+  try {
+    qrScanner = new Html5Qrcode('qr-reader');
+    await qrScanner.start(
+      { facingMode:'environment' },
+      { fps:10, qrbox:{ width:250, height:250 } },
+      (decoded) => {
+        // 스캔 성공
+        const serial = decoded.trim().toUpperCase();
+        const input  = document.getElementById('in-serial');
+        if (input) {
+          input.value = serial;
+          autoFillFromSerial(serial);
+        }
+        stopQR();
+        showToast('✅ 스캔 완료: ' + serial, 'ok');
+      },
+      () => { /* 스캔 중 오류 무시 */ }
+    );
+  } catch(e) {
+    showToast('📷 카메라 오류: ' + e.message, 'err');
+    stopQR();
   }
+}
+
+function stopQR() {
+  if (qrScanner) {
+    qrScanner.stop().catch(()=>{});
+    qrScanner.clear().catch(()=>{});
+    qrScanner = null;
+  }
+  const readerEl  = document.getElementById('qr-reader');
+  const triggerEl = document.getElementById('qr-trigger');
+  const stopBtn   = document.getElementById('qr-stop-btn');
+  if (readerEl)  readerEl.style.display  = 'none';
+  if (triggerEl) triggerEl.style.display = 'block';
+  if (stopBtn)   stopBtn.style.display   = 'none';
+}
+
+// ============================================================
+// 제조번호 자동 포맷 (예: 1r10001 → 1R1-0001)
+// ============================================================
+function formatSerial(input) {
+  let v = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (v.length > 3) v = v.slice(0,3) + '-' + v.slice(3);
+  if (v.length > 8) v = v.slice(0,8);
+  input.value = v;
+}
+
+// ============================================================
+// 제조번호 입력 시 이력에서 자동완성
+// ============================================================
+async function autoFillFromSerial(serial) {
+  serial = serial.trim().toUpperCase();
+  if (!serial || serial.length < 6) return; // 최소 길이 체크
+
+  try {
+    const res  = await fetch(`${API}?action=getHistory&serial=${encodeURIComponent(serial)}&k=${ACCESS_KEY}`);
+    const json = await res.json();
+    if (!json.success || !json.history?.length) return;
+
+    // 가장 최근 이력
+    const last = json.history[json.history.length-1];
+
+    // 형식명 자동 선택 (비어있을 때만)
+    if (last['형식명']) {
+      const typeEl = document.getElementById('in-type');
+      if (typeEl && !typeEl.value) {
+        typeEl.value = last['형식명'];
+        loadParts();
+      }
+    }
+    // 영업팀 자동 선택
+    if (last['영업팀']) {
+      const teamEl = document.getElementById('in-team');
+      if (teamEl && !teamEl.value) teamEl.value = last['영업팀'];
+    }
+    // 수요자명 자동 입력
+    if (last['수요자명']) {
+      const custEl = document.getElementById('in-customer');
+      if (custEl && !custEl.value) custEl.value = last['수요자명'];
+    }
+
+    showToast(`📋 ${serial} — 이전 AS ${json.total}회 이력 있어요`, 'ok');
+  } catch(e) { /* 자동완성 실패 무시 */ }
+}
+
+// ============================================================
+// 입고 신청 / 등록
+// ============================================================
+async function doRegister() {
+  const serial   = (document.getElementById('in-serial')?.value||'').trim().toUpperCase();
+  const model    = document.getElementById('in-model')?.value || '로터 베이터';
+  const type     = document.getElementById('in-type')?.value || '';
+  const teamEl   = document.getElementById('in-team');
+  const team     = TEAM || (teamEl?.value || '');
+  const region   = (document.getElementById('in-region')?.value||'').trim();
+  const customer = (document.getElementById('in-customer')?.value||'').trim();
+  const memo     = (document.getElementById('in-memo')?.value||'').trim();
+  const urgent   = document.getElementById('in-urgent')?.checked || false;
+
+  if (!serial) { showToast('제조번호를 입력하세요','err'); return; }
+  if (!type)   { showToast('형식명을 선택하세요','err'); return; }
+
+  // 부품 체크 수집
+  const partChecks = [];
+  document.querySelectorAll('#parts-list .part-item').forEach(item => {
+    const cb   = item.querySelector('.part-cb');
+    const name = (item.querySelector('.part-name')?.textContent||'').trim();
+    if (name) partChecks.push(name + (cb?.checked ? '✅' : '☐'));
+  });
+
+  showToast('⏳ 신청 중...');
+  const res = await postAPI({
+    action:'register', serial, model, type, team, region, customer, memo, urgent,
+    parts: partChecks.join(' / ')
+  });
+
+  if (res.success) {
+    showToast('✅ ' + res.message, 'ok');
+    // 폼 초기화
+    document.getElementById('in-serial').value   = '';
+    document.getElementById('in-type').value     = '';
+    document.getElementById('in-customer').value = '';
+    document.getElementById('in-memo').value     = '';
+    if (document.getElementById('in-region')) document.getElementById('in-region').value = '';
+    document.getElementById('parts-section').style.display = 'none';
+    if (document.getElementById('in-urgent')) document.getElementById('in-urgent').checked = false;
+    await loadData();
+  } else {
+    showToast('❌ ' + res.error, 'err');
+  }
+}
+
+// ============================================================
+// 입고 확정 모달
+// ============================================================
+function openCheckin(serial) {
+  const r = allData.find(d => d['제조번호']===serial);
+  if (!r) return;
+  currentSerial = serial;
+  checkinParts  = [];
+
+  document.getElementById('modal-checkin-info').innerHTML = infoBlock(r);
+
+  // 팀장 체크 내역
+  const teamParts = (r['입고부품체크']||'').trim();
+  const sec = document.getElementById('checkin-team-section');
+  if (teamParts) {
+    sec.style.display = 'block';
+    document.getElementById('checkin-team-content').textContent = teamParts;
+    // 팀장 체크 내역 기본값으로 세팅
+    checkinParts = teamParts.split(' / ')
+      .map(p => ({ name: p.replace(/[✅☐]/g,'').trim(), checked: p.includes('✅') }))
+      .filter(p => p.name);
+  } else {
+    sec.style.display = 'none';
+  }
+
   renderCheckinParts();
-  document.getElementById('modal-checkin').classList.add('open');
+  openModal('modal-checkin');
 }
 
 function renderCheckinParts() {
   const el = document.getElementById('checkin-parts-list');
+  if (!el) return;
   if (!checkinParts.length) {
-    el.innerHTML = `<div style="color:var(--gray4);font-size:12px;padding:6px">+ 버튼으로 부품을 추가하세요</div>`;
+    el.innerHTML = `<div style="color:var(--gray4);font-size:12px;padding:10px;text-align:center">+ 버튼으로 부품을 추가하세요</div>`;
     return;
   }
   el.innerHTML = checkinParts.map((p,i) => `
     <div class="part-item ${p.checked?'checked':''}" id="cpi-${i}" onclick="toggleCheckinPart(${i})">
       <div class="part-check-icon" id="cpic-${i}">${p.checked?'✓':''}</div>
-      <label class="part-name">${p.name}</label>
+      <input type="checkbox" class="part-cb" id="cpcb-${i}" ${p.checked?'checked':''}>
+      <span class="part-name">${esc(p.name)}</span>
     </div>`).join('');
 }
 
@@ -716,57 +1566,121 @@ function toggleCheckinPart(i) {
 
 function addCheckinPart() {
   const input = document.getElementById('checkin-new-part');
-  const name = input?.value.trim();
+  const name = (input?.value||'').trim();
   if (!name) return;
-  checkinParts.push({ name, checked: true });
+  checkinParts.push({ name, checked:true });
   renderCheckinParts();
   input.value = '';
 }
 
 async function doCheckin() {
-  const parts = checkinParts.map(p => p.name + (p.checked?'✅':'☐')).join(' / ');
+  const parts = checkinParts.map(p=>p.name+(p.checked?'✅':'☐')).join(' / ');
   showToast('⏳ 처리 중...');
-  const res = await postAPI({ action:'checkin', serial:currentSerial, parts, role:ROLE });
-  if (res.success) { showToast('📥 입고 확정 완료!'); closeModal('modal-checkin'); loadData(); }
-  else showToast('❌ ' + res.error, 'err');
+  const res = await postAPI({ action:'checkin', serial:currentSerial, parts });
+  if (res.success) { showToast('📥 입고 확정 완료!','ok'); closeModal('modal-checkin'); await loadData(); }
+  else showToast('❌ ' + res.error,'err');
 }
 
-// AS시작 모달 열기
-function openStartAS(serial) {
-  currentSerial = serial;
+// ============================================================
+// 누락정보 입력 (AS팀장 전용)
+// ============================================================
+function openMissing(serial) {
   const r = allData.find(d => d['제조번호']===serial);
-  document.getElementById('modal-start-info').innerHTML = `
-    <div class="ib-row"><span class="ib-label">기계</span><span class="ib-val">${r?.['기종명']||''} ${r?.['형식명']||''}</span></div>
-    <div class="ib-row"><span class="ib-label">제조번호</span><span class="ib-val">${serial}</span></div>
-    <div class="ib-row"><span class="ib-label">영업팀</span><span class="ib-val">${r?.['영업팀']||'-'}</span></div>`;
+  if (!r) return;
+  currentSerial = serial;
+  missingParts  = [];
+
+  document.getElementById('modal-missing-info').innerHTML = infoBlock(r);
+  document.getElementById('missing-type').value     = r['형식명']  || '';
+  const teamSel = document.getElementById('missing-team');
+  teamSel.innerHTML = '<option value="">선택</option>' + TEAMS_LIST.map(t=>`<option>${esc(t)}</option>`).join('');
+  teamSel.value = r['영업팀'] || '';
+  document.getElementById('missing-customer').value = r['수요자명']|| '';
+  document.getElementById('missing-memo').value     = r['메모']    || '';
+  renderMissingParts();
+  openModal('modal-missing');
+}
+
+function renderMissingParts() {
+  const el = document.getElementById('missing-parts-list');
+  if (!el) return;
+  if (!missingParts.length) {
+    el.innerHTML = `<div style="color:var(--gray4);font-size:12px;padding:10px;text-align:center">+ 버튼으로 부품 추가</div>`;
+    return;
+  }
+  el.innerHTML = missingParts.map((p,i) => `
+    <div class="part-item ${p.checked?'checked':''}" id="mpi-${i}" onclick="toggleMissingPart(${i})">
+      <div class="part-check-icon" id="mpic-${i}">${p.checked?'✓':''}</div>
+      <span class="part-name">${esc(p.name)}</span>
+    </div>`).join('');
+}
+
+function toggleMissingPart(i) { missingParts[i].checked=!missingParts[i].checked; renderMissingParts(); }
+
+function addMissingPart() {
+  const input = document.getElementById('missing-new-part');
+  const name = (input?.value||'').trim();
+  if (!name) return;
+  missingParts.push({ name, checked:true });
+  renderMissingParts();
+  input.value = '';
+}
+
+async function doUpdateMissing() {
+  const type     = document.getElementById('missing-type').value;
+  const team     = document.getElementById('missing-team').value;
+  const customer = (document.getElementById('missing-customer').value||'').trim();
+  const memo     = (document.getElementById('missing-memo').value||'').trim();
+  const parts    = missingParts.map(p=>p.name+(p.checked?'✅':'☐')).join(' / ');
+  showToast('⏳ 저장 중...');
+  const res = await postAPI({ action:'updateMissing', serial:currentSerial, type, team, customer, memo, parts });
+  if (res.success) { showToast('📝 저장 완료!','ok'); closeModal('modal-missing'); await loadData(); }
+  else showToast('❌ ' + res.error,'err');
+}
+
+// ============================================================
+// AS 시작
+// ============================================================
+function openStartAS(serial) {
+  const r = allData.find(d => d['제조번호']===serial);
+  if (!r) return;
+  currentSerial = serial;
+  document.getElementById('modal-start-info').innerHTML = infoBlock(r);
   document.getElementById('start-manager').value = '';
-  document.getElementById('modal-start').classList.add('open');
+  document.getElementById('start-zone-val').value = r['고장부위']||'';
+  renderZoneGrid('start-zone-grid','start-zone-val', r['고장부위']||'');
+  openModal('modal-start');
 }
 
 async function doStartAS() {
-  const manager = document.getElementById('start-manager').value.trim();
+  const manager   = (document.getElementById('start-manager').value||'').trim();
+  const faultZone = document.getElementById('start-zone-val').value;
   showToast('⏳ 처리 중...');
-  const res = await postAPI({ action:'startAS', serial:currentSerial, manager, role:ROLE });
-  if (res.success) { showToast('🔧 AS 시작!'); closeModal('modal-start'); loadData(); }
-  else showToast('❌ ' + res.error, 'err');
+  const res = await postAPI({ action:'startAS', serial:currentSerial, manager, faultZone });
+  if (res.success) { showToast('🔧 AS 시작!','ok'); closeModal('modal-start'); await loadData(); }
+  else showToast('❌ ' + res.error,'err');
 }
 
+// ============================================================
+// AS 완료
+// ============================================================
 function openComplete(serial) {
-  currentSerial = serial;
-  usedParts = [];
   const r = allData.find(d => d['제조번호']===serial);
-  document.getElementById('modal-complete-info').innerHTML = `
-    <div class="ib-row"><span class="ib-label">기계</span><span class="ib-val">${r?.['기종명']||''} ${r?.['형식명']||''}</span></div>
-    <div class="ib-row"><span class="ib-label">제조번호</span><span class="ib-val">${serial}</span></div>
-    <div class="ib-row"><span class="ib-label">영업팀</span><span class="ib-val">${r?.['영업팀']||'-'}</span></div>`;
-  document.getElementById('complete-fault').value = '';
+  if (!r) return;
+  currentSerial = serial;
+  usedParts     = [];
+  document.getElementById('modal-complete-info').innerHTML = infoBlock(r);
+  document.getElementById('complete-fault').value  = r['고장내용']||'';
   document.getElementById('complete-repair').value = '';
-  document.getElementById('complete-parts-list').innerHTML = `<div style="color:var(--gray4);font-size:12px;padding:6px">+ 버튼으로 사용한 부품을 추가하세요</div>`;
-  document.getElementById('modal-complete').classList.add('open');
+  document.getElementById('complete-zone-val').value = r['고장부위']||'';
+  document.getElementById('complete-parts-list').innerHTML =
+    `<div style="color:var(--gray4);font-size:12px;padding:10px;text-align:center">+ 버튼으로 사용한 부품 추가</div>`;
+  renderZoneGrid('complete-zone-grid','complete-zone-val', r['고장부위']||'');
+  openModal('modal-complete');
 }
 
 function addUsedPart() {
-  const name = document.getElementById('complete-new-part').value.trim();
+  const name = (document.getElementById('complete-new-part').value||'').trim();
   if (!name) return;
   usedParts.push({ name, qty:1 });
   renderUsedParts();
@@ -775,163 +1689,491 @@ function addUsedPart() {
 
 function renderUsedParts() {
   const el = document.getElementById('complete-parts-list');
-  if (!usedParts.length) { el.innerHTML=`<div style="color:var(--gray4);font-size:12px;padding:6px">+ 버튼으로 사용한 부품을 추가하세요</div>`; return; }
-  el.innerHTML = usedParts.map((p,i) => `
+  if (!el) return;
+  if (!usedParts.length) {
+    el.innerHTML = `<div style="color:var(--gray4);font-size:12px;padding:10px;text-align:center">+ 버튼으로 사용한 부품 추가</div>`;
+    return;
+  }
+  el.innerHTML = usedParts.map((p,i)=>`
     <div class="used-part-item">
-      <span class="part-name">${p.name}</span>
+      <span style="flex:1;font-size:14px">${esc(p.name)}</span>
       <button class="qty-btn qty-minus" onclick="changeQty(${i},-1)">−</button>
       <span class="qty-num">${p.qty}</span>
-      <button class="qty-btn qty-plus" onclick="changeQty(${i},1)">+</button>
+      <button class="qty-btn qty-plus"  onclick="changeQty(${i}, 1)">+</button>
       <span style="font-size:11px;color:var(--gray3)">개</span>
-      <button onclick="removeUsedPart(${i})" style="background:none;border:none;color:var(--gray4);font-size:16px;cursor:pointer;padding:0 4px">✕</button>
+      <button onclick="removeUsedPart(${i})"
+        style="background:none;border:none;color:var(--gray4);font-size:18px;cursor:pointer;padding:0 4px;line-height:1">✕</button>
     </div>`).join('');
 }
 
-function changeQty(i,d) { usedParts[i].qty=Math.max(1,usedParts[i].qty+d); renderUsedParts(); }
-function removeUsedPart(i) { usedParts.splice(i,1); renderUsedParts(); }
+function changeQty(i,d)     { usedParts[i].qty=Math.max(1,usedParts[i].qty+d); renderUsedParts(); }
+function removeUsedPart(i)  { usedParts.splice(i,1); renderUsedParts(); }
 
 async function doComplete() {
-  const fault  = document.getElementById('complete-fault').value.trim();
-  const repair = document.getElementById('complete-repair').value.trim();
+  const fault     = (document.getElementById('complete-fault').value||'').trim();
+  const repair    = (document.getElementById('complete-repair').value||'').trim();
+  const faultZone = document.getElementById('complete-zone-val').value;
   if (!fault)  { showToast('고장 내용을 입력하세요','err'); return; }
   if (!repair) { showToast('수리 내역을 입력하세요','err'); return; }
   showToast('⏳ 처리 중...');
-  const res = await postAPI({ action:'completeAS', serial:currentSerial, fault, repair, usedParts, role:ROLE });
-  if (res.success) { showToast('✅ AS 완료!'); closeModal('modal-complete'); loadData(); }
-  else showToast('❌ ' + res.error, 'err');
+  const res = await postAPI({ action:'completeAS', serial:currentSerial, fault, repair, faultZone, usedParts });
+  if (res.success) { showToast('✅ AS 완료!','ok'); closeModal('modal-complete'); await loadData(); }
+  else showToast('❌ ' + res.error,'err');
 }
 
+// ============================================================
+// 출고
+// ============================================================
 function openOut(serial) {
-  currentSerial = serial;
   const r = allData.find(d => d['제조번호']===serial);
-  document.getElementById('modal-out-info').innerHTML = `
-    <div class="ib-row"><span class="ib-label">기계</span><span class="ib-val">${r?.['기종명']||''} ${r?.['형식명']||''}</span></div>
-    <div class="ib-row"><span class="ib-label">제조번호</span><span class="ib-val">${serial}</span></div>
-    <div class="ib-row"><span class="ib-label">영업팀</span><span class="ib-val">${r?.['영업팀']||'-'}</span></div>
-    <div class="ib-row"><span class="ib-label">수요자</span><span class="ib-val">${r?.['수요자명']||'-'}</span></div>
-    <div class="ib-row"><span class="ib-label">수리내역</span><span class="ib-val">${r?.['수리내역']||'-'}</span></div>`;
-  document.getElementById('modal-out-parts').innerHTML = r?.['입고부품체크']
-    ?`<div style="background:var(--orange3);border-radius:10px;padding:10px;font-size:12px;color:var(--orange2)">📦 입고 시 부품: ${r['입고부품체크']}</div>`:'';
-  document.getElementById('modal-out-msg').innerHTML = `출고 처리 후 <strong>${r?.['영업팀']||''}</strong>에 알림됩니다.`;
-  document.getElementById('modal-out').classList.add('open');
+  if (!r) return;
+  currentSerial = serial;
+  document.getElementById('modal-out-info').innerHTML = infoBlock(r);
+  document.getElementById('modal-out-parts').innerHTML = r['입고부품체크']
+    ? `<div class="notice-box nb-yellow">📦 입고 시 부품: ${esc(r['입고부품체크'])}</div>` : '';
+  document.getElementById('modal-out-msg').innerHTML =
+    `출고 처리 후 <strong>${esc(r['영업팀']||'')}</strong>에 알림됩니다.`;
+  openModal('modal-out');
 }
 
 async function doCheckout() {
   showToast('⏳ 처리 중...');
-  const res = await postAPI({ action:'checkout', serial:currentSerial, role:ROLE });
-  if (res.success) { showToast(`📤 출고 완료! (소요: ${res.days}일)`); closeModal('modal-out'); loadData(); }
-  else showToast('❌ ' + res.error, 'err');
+  const res = await postAPI({ action:'checkout', serial:currentSerial });
+  if (res.success) {
+    showToast(`📤 출고 완료! (소요: ${res.days}일)`,'ok');
+    closeModal('modal-out'); await loadData();
+  } else showToast('❌ ' + res.error,'err');
 }
 
+// ============================================================
+// 강제 상태변경 (부서장/공장장)
+// ============================================================
 function openForce(serial) {
-  currentSerial = serial;
   const r = allData.find(d => d['제조번호']===serial);
-  document.getElementById('modal-force-info').innerHTML = `
-    <div class="ib-row"><span class="ib-label">기계</span><span class="ib-val">${r?.['기종명']||''} ${r?.['형식명']||''}</span></div>
-    <div class="ib-row"><span class="ib-label">제조번호</span><span class="ib-val">${serial}</span></div>
-    <div class="ib-row"><span class="ib-label">현재상태</span><span class="ib-val">${r?.['상태']||'-'}</span></div>`;
-  document.getElementById('force-status').value = r?.['상태']||'대기';
-  document.getElementById('modal-force').classList.add('open');
+  if (!r) return;
+  currentSerial = serial;
+  document.getElementById('modal-force-info').innerHTML = infoBlock(r);
+  document.getElementById('force-status').value = r['상태']||'대기';
+  openModal('modal-force');
 }
 
 async function doForceStatus() {
   const status = document.getElementById('force-status').value;
   showToast('⏳ 처리 중...');
-  const res = await postAPI({ action:'forceStatus', serial:currentSerial, status, role:ROLE });
-  if (res.success) { showToast('⚡ 상태 변경 완료'); closeModal('modal-force'); loadData(); }
-  else showToast('❌ ' + res.error, 'err');
-}
-
-async function doSearch() {
-  const serial = document.getElementById('search-serial').value.trim().toUpperCase();
-  if (!serial) { showToast('제조번호를 입력하세요','err'); return; }
-  const el = document.getElementById('history-result');
-  el.innerHTML = '<div class="loading"><div class="spinner"></div>조회 중...</div>';
-  try {
-    const res = await fetch(`${API}?action=getHistory&serial=${encodeURIComponent(serial)}`);
-    const json = await res.json();
-    if (!json.success || !json.history.length) { el.innerHTML=`<div style="text-align:center;padding:16px;color:var(--gray4);font-size:13px">이력이 없습니다</div>`; return; }
-    el.innerHTML = `<div class="history-box">
-      <div style="display:flex;justify-content:space-between;margin-bottom:10px">
-        <span style="font-size:13px;font-weight:700">${serial}</span>
-        <span style="font-size:11px;color:var(--gray3)">총 <strong style="color:var(--blue2)">${json.total}회</strong> AS</span>
-      </div>
-      ${json.history.map(r=>`
-      <div class="history-item">
-        <div class="history-date">${formatDate(r['신청일시'])}</div>
-        <div class="history-content">${r['기종명']||''} ${r['형식명']||''} · <span class="status ${statusClass(r['상태'])}">${r['상태']}</span></div>
-        ${r['고장내용']?`<div class="history-detail">🔍 ${r['고장내용']}</div>`:''}
-        ${r['수리내역']?`<div class="history-detail">🔧 ${r['수리내역']}</div>`:''}
-      </div>`).join('')}
-    </div>`;
-  } catch(e) { el.innerHTML=`<div style="color:var(--red2);font-size:12px;padding:8px">조회 오류: ${e.message}</div>`; }
-}
-
-async function loadParts() {
-  const type = document.getElementById('in-type')?.value;
-  const sec = document.getElementById('parts-section');
-  const list = document.getElementById('parts-list');
-  if (!type||!sec||!list) return;
-  sec.style.display = 'block';
-  list.innerHTML = '<div style="color:var(--gray4);font-size:12px;padding:6px">불러오는 중...</div>';
-  try {
-    const res = await fetch(`${API}?action=getParts&type=${encodeURIComponent(type)}`);
-    const json = await res.json();
-    if (json.parts && json.parts.length) {
-      list.innerHTML = json.parts.map((p,i) => `
-        <div class="part-item" id="pi-${i}" onclick="togglePart(${i})">
-          <div class="part-check-icon" id="pic-${i}"></div>
-          <input type="checkbox" class="part-cb" id="part-${i}">
-          <label class="part-name">${p}</label>
-        </div>`).join('');
-    } else {
-      list.innerHTML = `<div style="color:var(--gray4);font-size:12px;padding:6px">${type} 부품 목록 없음 — 아래서 추가하세요</div>`;
-    }
-  } catch(e) { list.innerHTML=`<div style="color:var(--red2);font-size:12px">오류: ${e.message}</div>`; }
-}
-
-function togglePart(i) {
-  const item=document.getElementById('pi-'+i);
-  const cb=document.getElementById('part-'+i);
-  const icon=document.getElementById('pic-'+i);
-  const checked=!cb.checked;
-  cb.checked=checked;
-  item.classList.toggle('checked',checked);
-  icon.textContent=checked?'✓':'';
-}
-
-async function addNewPart() {
-  const type=document.getElementById('in-type')?.value;
-  const input=document.getElementById('new-part-input');
-  const name=input?.value.trim();
-  if (!type) { showToast('형식명을 먼저 선택하세요','warn'); return; }
-  if (!name) { showToast('부품명을 입력하세요','err'); return; }
-  const res=await postAPI({ action:'addPart', type, partName:name });
-  if (res.success) { showToast('✅ 부품 추가됨'); if(input) input.value=''; loadParts(); }
+  const res = await postAPI({ action:'forceStatus', serial:currentSerial, status });
+  if (res.success) { showToast('⚡ 상태 변경 완료','ok'); closeModal('modal-force'); await loadData(); }
   else showToast('❌ ' + res.error,'err');
 }
 
+// ============================================================
+// 기계 정보 수정 (부서장/공장장 + 팀장/직원 본인신청건)
+// ============================================================
+function openEditInfo(serial) {
+  const r = allData.find(d => d['제조번호']===serial);
+  if (!r) return;
+  currentSerial = serial;
+  document.getElementById('modal-edit-info-block').innerHTML = infoBlock(r);
+  document.getElementById('edit-customer').value = r['수요자명']||'';
+  document.getElementById('edit-region').value   = r['지역']||'';
+
+  const teamWrap = document.getElementById('edit-team-wrap');
+  const memoWrap = document.getElementById('edit-memo-wrap');
+  if (isAdminLike()) {
+    teamWrap.style.display = 'block';
+    memoWrap.style.display = 'none';
+    const sel = document.getElementById('edit-team');
+    sel.innerHTML = TEAMS_LIST.map(t=>`<option ${t===r['영업팀']?'selected':''}>${esc(t)}</option>`).join('');
+  } else {
+    teamWrap.style.display = 'none';
+    memoWrap.style.display = 'block';
+    document.getElementById('edit-memo').value = r['메모']||'';
+  }
+  openModal('modal-edit-info');
+}
+
+async function doEditInfo() {
+  const customer = document.getElementById('edit-customer').value.trim();
+  const region   = document.getElementById('edit-region').value.trim();
+  const body = { action:'updateMachineInfo', serial:currentSerial, customer, region };
+  if (isAdminLike()) {
+    body.team = document.getElementById('edit-team').value;
+  } else {
+    body.memo = document.getElementById('edit-memo').value.trim();
+  }
+  showToast('⏳ 저장 중...');
+  const res = await postAPI(body);
+  if (res.success) { showToast('✏️ 저장됨','ok'); closeModal('modal-edit-info'); await loadData(); }
+  else showToast('❌ ' + res.error,'err');
+}
+
+// ============================================================
+// AS중 수리내역 수정 (AS팀장)
+// ============================================================
+function openEditProgress(serial) {
+  const r = allData.find(d => d['제조번호']===serial);
+  if (!r) return;
+  currentSerial = serial;
+  document.getElementById('modal-edit-progress-info').innerHTML = infoBlock(r);
+  document.getElementById('editp-fault').value  = r['고장내용']||'';
+  document.getElementById('editp-repair').value = r['수리내역']||'';
+  document.getElementById('editp-zone-val').value = r['고장부위']||'';
+  renderZoneGrid('editp-zone-grid','editp-zone-val', r['고장부위']||'');
+  openModal('modal-edit-progress');
+}
+
+async function doEditProgress() {
+  const fault     = document.getElementById('editp-fault').value.trim();
+  const repair    = document.getElementById('editp-repair').value.trim();
+  const faultZone = document.getElementById('editp-zone-val').value;
+  showToast('⏳ 저장 중...');
+  const res = await postAPI({ action:'updateASProgress', serial:currentSerial, fault, repair, faultZone });
+  if (res.success) { showToast('💾 저장됨','ok'); closeModal('modal-edit-progress'); await loadData(); }
+  else showToast('❌ ' + res.error,'err');
+}
+
+// ============================================================
+// 사용부품 확인 (공장장)
+// ============================================================
+async function openPartsConfirm(serial) {
+  currentSerial = serial;
+  document.getElementById('parts-confirm-list').innerHTML = `<div class="loading" style="padding:16px"><div class="spinner" style="width:24px;height:24px"></div></div>`;
+  openModal('modal-parts-confirm');
+  try {
+    const res  = await fetch(`${API}?action=getUsedPartsGrouped&k=${ACCESS_KEY}`);
+    const json = await res.json();
+    if (!json.success) { document.getElementById('parts-confirm-list').innerHTML = `<div style="color:var(--red2);font-size:12px">${esc(json.error||'오류')}</div>`; return; }
+    usedPartsAll = json.items || [];
+    renderPartsConfirmList(serial);
+  } catch(e) {
+    document.getElementById('parts-confirm-list').innerHTML = `<div style="color:var(--red2);font-size:12px">조회 오류</div>`;
+  }
+}
+
+function renderPartsConfirmList(serial) {
+  const items = usedPartsAll.filter(p => p['제조번호']===serial);
+  const el = document.getElementById('parts-confirm-list');
+  if (!items.length) { el.innerHTML = `<div style="color:var(--gray4);font-size:12px;padding:10px;text-align:center">등록된 사용부품이 없어요</div>`; return; }
+  el.innerHTML = `<div class="parts-box">` + items.map(p => `
+    <div class="part-item ${p.confirmed?'checked':''}" onclick="toggleConfirmPart(${p.rowNum},'${serial}')">
+      <div class="part-check-icon">${p.confirmed?'✓':''}</div>
+      <span class="part-name">${esc(p['부품명'])} × ${esc(p['수량'])}${p.confirmed?` <small style="color:var(--gray3)">(${esc(p['확인자']||'')})</small>`:''}</span>
+    </div>`).join('') + `</div>`;
+}
+
+async function toggleConfirmPart(rowNum, serial) {
+  const res = await postAPI({ action:'confirmUsedPart', rowNum });
+  if (res.success) {
+    const item = usedPartsAll.find(p=>p.rowNum===rowNum);
+    if (item) item.confirmed = !item.confirmed;
+    renderPartsConfirmList(serial);
+  } else showToast('❌ ' + res.error,'err');
+}
+
+// ============================================================
+// 직원 링크 관리 (팀장/부서장/공장장/관리자)
+// ============================================================
+async function loadStaffList() {
+  try {
+    const res  = await fetch(`${API}?action=listStaff&k=${ACCESS_KEY}`);
+    const json = await res.json();
+    if (json.success) staffList = json.staff || [];
+  } catch(e) { /* 무시 */ }
+}
+
+function staffListHTML(list, showTeam) {
+  if (!list.length) return `<div style="color:var(--gray4);font-size:12px;padding:8px 0">등록된 직원이 없어요</div>`;
+  return list.map(s => `
+    <div class="li" style="margin-bottom:8px">
+      <div class="li-top">
+        <div>
+          <div class="li-model">${esc(s.name)}${showTeam?` <span class="team-tag">${esc(s.team)}</span>`:''}</div>
+          <div class="li-serial">${s.phone?'📞 '+esc(s.phone)+' · ':''}${s.region?'📍 '+esc(s.region):''}</div>
+        </div>
+        <span class="status ${s.blocked?'s-out':'s-done'}">${s.blocked?'차단됨':'사용중'}</span>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <button class="btn-sm b" onclick="copyStaffLink('${s.key}')">🔗 링크복사</button>
+        <button class="btn-sm o" onclick="doToggleStaff('${s.key}')">${s.blocked?'✅ 차단해제':'⛔ 차단'}</button>
+        <button class="btn-sm r" onclick="doDeleteStaff('${s.key}')">🗑 삭제</button>
+      </div>
+    </div>`).join('');
+}
+
+function copyStaffLink(key) {
+  const url = `${location.origin}${location.pathname}?k=${key}`;
+  if (navigator.clipboard) navigator.clipboard.writeText(url).then(()=>showToast('🔗 링크가 복사되었어요','ok')).catch(()=>showToast(url,'ok'));
+  else showToast(url,'ok');
+}
+
+async function doToggleStaff(key) {
+  const res = await postAPI({ action:'toggleStaff', key });
+  if (res.success) { showToast(res.message,'ok'); await loadStaffList(); renderMyTeamStaffSection(); renderSettingsStaffSection(); }
+  else showToast('❌ ' + res.error,'err');
+}
+
+async function doDeleteStaff(key) {
+  const res = await postAPI({ action:'deleteStaff', key });
+  if (res.success) { showToast('🗑 삭제됨','ok'); await loadStaffList(); renderMyTeamStaffSection(); renderSettingsStaffSection(); }
+  else showToast('❌ ' + res.error,'err');
+}
+
+async function createStaffFromTeam() {
+  const name = (document.getElementById('staff-new-name')?.value||'').trim();
+  if (!name) { showToast('직원 이름을 입력하세요','err'); return; }
+  const phone  = document.getElementById('staff-new-phone')?.value.trim()||'';
+  const region = document.getElementById('staff-new-region')?.value.trim()||'';
+  const res = await postAPI({ action:'createStaff', name, phone, region });
+  if (res.success) {
+    showToast('✅ 직원 링크가 생성됐어요','ok');
+    document.getElementById('staff-new-name').value='';
+    document.getElementById('staff-new-phone').value='';
+    document.getElementById('staff-new-region').value='';
+    copyStaffLink(res.key);
+    await loadStaffList(); renderMyTeamStaffSection();
+  } else showToast('❌ ' + res.error,'err');
+}
+
+function renderMyTeamStaffSection() {
+  const el = document.getElementById('myteam-staff-section');
+  if (!el) return;
+  el.innerHTML = staffListHTML(staffList, false);
+}
+
+// ============================================================
+// 관리자 설정 패널 (기종/영업팀/전체직원)
+// ============================================================
+async function openSettingsPanel() {
+  openModal('modal-settings');
+  renderSettingsTypesSection();
+  renderSettingsTeamsSection();
+  if (isAdminLike()) { await loadStaffList(); renderSettingsStaffSection(); }
+  else document.getElementById('settings-staff-list').innerHTML = `<div style="color:var(--gray4);font-size:12px">부서장/공장장/관리자만 전체 직원을 볼 수 있어요</div>`;
+}
+
+function renderSettingsTypesSection() {
+  const el = document.getElementById('settings-types-list');
+  el.innerHTML = TYPES_LIST.map(t=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #EEE">
+      <span style="font-size:13px">${esc(t)}</span>
+      <button class="btn-sm r" onclick="removeTypeSetting('${esc(t)}')">삭제</button>
+    </div>`).join('');
+}
+function renderSettingsTeamsSection() {
+  const el = document.getElementById('settings-teams-list');
+  el.innerHTML = TEAMS_LIST.map(t=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #EEE">
+      <span style="font-size:13px">${esc(t)}</span>
+      <button class="btn-sm r" onclick="removeTeamSetting('${esc(t)}')">삭제</button>
+    </div>`).join('');
+}
+function renderSettingsStaffSection() {
+  const el = document.getElementById('settings-staff-list');
+  if (!el) return;
+  el.innerHTML = staffListHTML(staffList, true);
+}
+
+async function addTypeSetting() {
+  const input = document.getElementById('settings-new-type');
+  const value = (input.value||'').trim();
+  if (!value) return;
+  const res = await postAPI({ action:'addType', value });
+  if (res.success) { TYPES_LIST.push(value); input.value=''; renderSettingsTypesSection(); showToast('✅ 추가됨','ok'); }
+  else showToast('❌ ' + res.error,'err');
+}
+async function removeTypeSetting(value) {
+  const res = await postAPI({ action:'removeType', value });
+  if (res.success) { TYPES_LIST = TYPES_LIST.filter(t=>t!==value); renderSettingsTypesSection(); showToast('🗑 삭제됨','ok'); }
+  else showToast('❌ ' + res.error,'err');
+}
+async function addTeamSetting() {
+  const input = document.getElementById('settings-new-team');
+  const value = (input.value||'').trim();
+  if (!value) return;
+  const res = await postAPI({ action:'addTeam', value });
+  if (res.success) { TEAMS_LIST.push(value); input.value=''; renderSettingsTeamsSection(); showToast('✅ 추가됨','ok'); }
+  else showToast('❌ ' + res.error,'err');
+}
+async function removeTeamSetting(value) {
+  const res = await postAPI({ action:'removeTeam', value });
+  if (res.success) { TEAMS_LIST = TEAMS_LIST.filter(t=>t!==value); renderSettingsTeamsSection(); showToast('🗑 삭제됨','ok'); }
+  else showToast('❌ ' + res.error,'err');
+}
+
+// ============================================================
+// 이력 조회
+// ============================================================
+async function doSearch() {
+  const input  = document.getElementById('search-serial');
+  const serial = (input?.value||'').trim().toUpperCase();
+  if (!serial) { showToast('제조번호를 입력하세요','err'); return; }
+
+  const el = document.getElementById('history-result');
+  el.innerHTML = `<div class="loading" style="padding:16px"><div class="spinner" style="width:24px;height:24px;margin-bottom:6px"></div><p style="font-size:12px">조회 중...</p></div>`;
+
+  try {
+    const res  = await fetch(`${API}?action=getHistory&serial=${encodeURIComponent(serial)}&k=${ACCESS_KEY}`);
+    const json = await res.json();
+
+    if (!json.success || !json.history?.length) {
+      el.innerHTML = `<div style="text-align:center;padding:16px;color:var(--gray4);font-size:13px">이력이 없습니다</div>`;
+      return;
+    }
+
+    el.innerHTML = `
+      <div class="history-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span style="font-size:13px;font-weight:700">${esc(serial)}</span>
+          <span style="font-size:11px;color:var(--gray3)">총 <strong style="color:var(--blue2)">${json.total}회</strong> AS</span>
+        </div>
+        ${json.history.map(r=>`
+        <div class="history-item">
+          <div class="history-date">${formatDate(r['신청일시'])}</div>
+          <div class="history-content">
+            ${esc(r['기종명']||'')} ${esc(r['형식명']||'')}
+            ${r['고장부위']?`<span class="zone-tag">🎯 ${esc(r['고장부위'])}</span>`:''}
+            <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
+          </div>
+          ${r['고장내용']?`<div class="history-detail">🔍 ${esc(r['고장내용'])}</div>`:''}
+          ${r['수리내역']?`<div class="history-detail">🔧 ${esc(r['수리내역'])}</div>`:''}
+          ${r['수요자명']?`<div class="history-detail">👤 ${esc(r['수요자명'])}</div>`:''}
+        </div>`).join('')}
+      </div>`;
+  } catch(e) {
+    el.innerHTML = `<div style="color:var(--red2);font-size:12px;padding:10px">조회 오류: ${e.message}</div>`;
+  }
+}
+
+// ============================================================
+// 부품 목록 로드 (형식명 선택 시)
+// ============================================================
+async function loadParts() {
+  const type = document.getElementById('in-type')?.value;
+  const sec  = document.getElementById('parts-section');
+  const list = document.getElementById('parts-list');
+  if (!sec || !list) return;
+
+  if (!type) { sec.style.display='none'; return; }
+  sec.style.display = 'block';
+  list.innerHTML = `<div style="color:var(--gray4);font-size:12px;padding:10px;text-align:center">불러오는 중...</div>`;
+
+  try {
+    const res  = await fetch(`${API}?action=getParts&type=${encodeURIComponent(type)}&k=${ACCESS_KEY}`);
+    const json = await res.json();
+
+    if (json.parts?.length) {
+      list.innerHTML = json.parts.map((p,i)=>`
+        <div class="part-item" id="pi-${i}" onclick="togglePart(${i})">
+          <div class="part-check-icon" id="pic-${i}"></div>
+          <input type="checkbox" class="part-cb" id="pcb-${i}">
+          <span class="part-name">${esc(p)}</span>
+        </div>`).join('');
+    } else {
+      list.innerHTML = `<div style="color:var(--gray4);font-size:12px;padding:10px;text-align:center">${esc(type)} 부품 없음 — 아래서 추가하세요</div>`;
+    }
+  } catch(e) {
+    list.innerHTML = `<div style="color:var(--red2);font-size:12px;padding:10px">오류: ${e.message}</div>`;
+  }
+}
+
+function togglePart(i) {
+  const item    = document.getElementById('pi-'+i);
+  const cb      = document.getElementById('pcb-'+i);
+  const icon    = document.getElementById('pic-'+i);
+  if (!item||!cb||!icon) return;
+  const checked = !cb.checked;
+  cb.checked = checked;
+  item.classList.toggle('checked', checked);
+  icon.textContent = checked ? '✓' : '';
+}
+
+async function addNewPart() {
+  const type  = document.getElementById('in-type')?.value;
+  const input = document.getElementById('new-part-input');
+  const name  = (input?.value||'').trim();
+  if (!type) { showToast('형식명을 먼저 선택하세요','warn'); return; }
+  if (!name) { showToast('부품명을 입력하세요','err'); return; }
+  const res = await postAPI({ action:'addPart', type, partName:name });
+  if (res.success) { showToast('✅ 부품 추가됨','ok'); if(input) input.value=''; loadParts(); }
+  else showToast('❌ ' + res.error,'err');
+}
+
+// ============================================================
+// 고장 부위 그리드
+// ============================================================
+function renderZoneGrid(gridId, hiddenId, selected) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  grid.innerHTML = FAULT_ZONES.map(z=>`
+    <button class="zone-btn ${z===selected?'selected':''}"
+      onclick="selectZone('${gridId}','${hiddenId}','${z}',this)">
+      ${esc(z)}
+    </button>`).join('');
+}
+
+function selectZone(gridId, hiddenId, zone, btn) {
+  document.querySelectorAll(`#${gridId} .zone-btn`).forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById(hiddenId).value = zone;
+}
+
+// ============================================================
+// 완료 탭 검색
+// ============================================================
+function searchDone() {
+  const q = (document.getElementById('done-search')?.value||'').trim().toUpperCase();
+  if (!q) { renderScreen('done'); return; }
+
+  const results = allData.filter(r =>
+    ((r['제조번호']||'').toUpperCase().includes(q) || (r['수요자명']||'').toUpperCase().includes(q)) &&
+    (r['상태']==='완료'||r['상태']==='출고') &&
+    (!TEAM || r['영업팀']===TEAM)
+  );
+
+  const c = document.getElementById('main-content');
+  if (!results.length) {
+    c.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">🔍</div>
+        <p>"${esc(q)}" 검색 결과가 없어요</p>
+      </div>`;
+    return;
+  }
+
+  c.innerHTML = `<div class="sec-label">검색 결과 · ${results.length}건</div>` +
+    results.map(r=>`
+    <div class="li">
+      <div class="li-top">
+        <div>
+          <div class="li-model">${esc(r['기종명']||'')} ${esc(r['형식명']||'')}</div>
+          <div class="li-serial">🔖 ${esc(r['제조번호'])}${r['영업팀']?' · '+esc(r['영업팀']):''}</div>
+        </div>
+        <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
+      </div>
+      ${r['수리내역']?`<div style="font-size:12px;color:var(--gray3);margin-top:6px">🔧 ${esc(r['수리내역'])}</div>`:''}
+      <div style="font-size:11px;color:var(--gray4);margin-top:6px">${formatDate(r['완료일시']||r['출고일시'])}</div>
+    </div>`).join('');
+}
+
+// ============================================================
+// 공통 유틸
+// ============================================================
+
+// API POST
 async function postAPI(body) {
   try {
+    body.k = ACCESS_KEY;
     const res = await fetch(API, { method:'POST', body:JSON.stringify(body) });
     return await res.json();
-  } catch(e) { return { error: e.message }; }
+  } catch(e) {
+    return { error: e.message };
+  }
 }
 
-function filterByRole(data) {
-  if (TEAM) return data.filter(r => r['영업팀']===TEAM+'팀');
-  return data;
-}
+// 모달
+function openModal(id)  { document.getElementById(id)?.classList.add('open'); }
+function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
 
-function statusClass(s) {
-  if(s==='신청') return 's-req';
-  if(s==='대기') return 's-wait';
-  if(s==='AS중') return 's-ing';
-  if(s==='완료') return 's-done';
-  if(s==='출고') return 's-out';
-  return '';
-}
-
+// 날짜 포맷
 function formatDate(v, short) {
   if (!v) return '-';
   const d = new Date(v);
@@ -939,21 +2181,50 @@ function formatDate(v, short) {
   const now = new Date();
   const isToday = d.toDateString()===now.toDateString();
   const time = d.toTimeString().substring(0,5);
-  if (short) return isToday?`오늘\n${time}`:`${d.getMonth()+1}/${d.getDate()}\n${time}`;
-  return isToday?`오늘 ${time}`:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${time}`;
+  if (short) return isToday ? `오늘\n${time}` : `${d.getMonth()+1}/${d.getDate()}\n${time}`;
+  return isToday ? `오늘 ${time}` :
+    `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${time}`;
 }
 
-function setFilter(f) { currentFilter=f; renderScreen('done'); }
-function filterDone() { const q=document.getElementById('done-search')?.value.trim(); showToast(q?`🔍 "${q}" 검색 중...`:'전체 표시'); }
-function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+// 상태 CSS 클래스
+function statusClass(s) {
+  return { '신청':'s-req','대기':'s-wait','AS중':'s-ing','완료':'s-done','출고':'s-out' }[s]||'';
+}
 
-let toastTimer;
+// XSS 방지 이스케이프
+function esc(str) {
+  if (str===null||str===undefined) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+}
+
+// 기계 정보 블록
+function infoBlock(r) {
+  const rows = [
+    ['기계',    `${esc(r['기종명']||'')} ${esc(r['형식명']||'')}`],
+    ['제조번호', esc(r['제조번호']||'-')],
+    ['영업팀',  esc(r['영업팀']||'-')],
+    ['수요자',  esc(r['수요자명']||'-')],
+    ['상태',    `<span class="status ${statusClass(r['상태'])}">${r['상태']||'-'}</span>`],
+  ].filter(([,v])=>v&&v!=='-'&&v!=='&nbsp;');
+  return rows.map(([l,v])=>
+    `<div class="ib-row"><span class="ib-label">${l}</span><span class="ib-val">${v}</span></div>`
+  ).join('');
+}
+
+// 날짜 필터
+function setFilter(f) { currentFilter=f; renderScreen('done'); }
+
+// 토스트
 function showToast(msg, type='') {
-  const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className='toast '+(type?type+' ':'')+'show';
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.className='toast',2600);
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast show' + (type?' '+type:'');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(()=>{ t.className='toast'; }, 2800);
 }
 </script>
 </body>
