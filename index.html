@@ -1388,15 +1388,48 @@ async function startQR() {
       { facingMode:'environment' },
       { fps:10, qrbox:{ width:250, height:250 } },
       (decoded) => {
-        // 스캔 성공
-        const serial = decoded.trim().toUpperCase();
-        const input  = document.getElementById('in-serial');
-        if (input) {
-          input.value = serial;
-          autoFillFromSerial(serial);
+        // QR 데이터 파싱
+        // 예: "로터 베이터/TR 40/42 날/6 R3-/0119"
+        const raw = decoded.trim();
+        const p   = raw.split('/').map(s => s.trim());
+
+        let model  = '';
+        let type   = '';
+        let serial = '';
+
+        if (p.length >= 5) {
+          // 표준 농기계 QR: 기종명/형식명/규격/제조번호앞/제조번호뒤
+          model  = (p[0] || '').replace(/\s+/g, '');          // 로터베이터
+          type   = (p[1] || '').replace(/\s+/g, '');          // TR40
+          // 제조번호: p[3]+p[4] 합치고 공백 제거
+          serial = ((p[3] || '') + (p[4] || '')).replace(/\s+/g, '').toUpperCase(); // 6R3-0119
+        } else if (p.length === 1) {
+          // 제조번호만 있는 단순 QR
+          serial = raw.replace(/\s+/g, '').toUpperCase();
+        } else {
+          // 기타: 마지막 항목을 제조번호로
+          serial = (p[p.length-1] || '').replace(/\s+/g, '').toUpperCase();
         }
+
+        // 화면 입력값 채우기
+        const serialInput = document.getElementById('in-serial');
+        const modelSelect = document.getElementById('in-model');
+        const typeSelect  = document.getElementById('in-type');
+
+        if (serialInput) { serialInput.value = serial; formatSerial(serialInput); }
+        if (modelSelect && model) {
+          // select 옵션 중 일치하는 것 선택 (없으면 그대로)
+          const opt = Array.from(modelSelect.options).find(o => o.value.replace(/\s+/g,'') === model);
+          if (opt) modelSelect.value = opt.value;
+        }
+        if (typeSelect && type) {
+          const opt = Array.from(typeSelect.options).find(o => o.value.replace(/\s+/g,'') === type);
+          if (opt) typeSelect.value = opt.value;
+        }
+        if (serial) autoFillFromSerial(serialInput ? serialInput.value : serial);
+
         stopQR();
-        showToast('✅ 스캔 완료: ' + serial, 'ok');
+        showToast(`✅ 스캔 완료: ${serialInput ? serialInput.value : serial}`, 'ok');
       },
       () => { /* 스캔 중 오류 무시 */ }
     );
