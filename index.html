@@ -797,8 +797,7 @@ function renderIn() {
   <div class="card">
     <div class="card-title">${isTeam ? '📋 입고 신청' : '📥 신규 입고 등록'}</div>
 
-    <!-- QR 스캔 (관리자만) -->
-    ${isAdmin ? `
+    <!-- QR 스캔 (전 역할 공통) -->
     <div class="qr-box" id="qr-trigger" onclick="startQR()">
       <div class="qr-icon">📷</div>
       <p style="font-size:13px;color:var(--gray3);font-weight:500">QR 코드 스캔</p>
@@ -809,7 +808,7 @@ function renderIn() {
       style="display:none;width:100%;padding:10px;background:var(--red3);color:var(--red2);border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px">
       ⏹ 스캔 중지
     </button>
-    <div class="divider">또는 직접 입력</div>` : ''}
+    <div class="divider">또는 직접 입력</div>
 
     <!-- 제조번호 -->
     <div class="ig">
@@ -1464,16 +1463,31 @@ async function startQR() {
   }
 }
 
-function stopQR() {
+async function stopQR() {
   if (qrScanner) {
-    qrScanner.stop().catch(()=>{});
-    qrScanner.clear().catch(()=>{});
+    try {
+      await qrScanner.stop();
+    } catch(e) { /* 무시 */ }
+    try {
+      qrScanner.clear();
+    } catch(e) { /* 무시 */ }
     qrScanner = null;
   }
+  // 카메라 스트림 강제 종료 (안 꺼지는 경우 대비)
+  try {
+    const videos = document.querySelectorAll('#qr-reader video');
+    videos.forEach(v => {
+      if (v.srcObject) {
+        v.srcObject.getTracks().forEach(t => t.stop());
+        v.srcObject = null;
+      }
+    });
+  } catch(e) { /* 무시 */ }
+
   const readerEl  = document.getElementById('qr-reader');
   const triggerEl = document.getElementById('qr-trigger');
   const stopBtn   = document.getElementById('qr-stop-btn');
-  if (readerEl)  readerEl.style.display  = 'none';
+  if (readerEl)  { readerEl.style.display  = 'none'; readerEl.innerHTML = ''; }
   if (triggerEl) triggerEl.style.display = 'block';
   if (stopBtn)   stopBtn.style.display   = 'none';
 }
