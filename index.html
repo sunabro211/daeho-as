@@ -418,6 +418,14 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
         <option value="출고">출고</option>
       </select>
     </div>
+    <div style="background:var(--red3);border-radius:10px;padding:12px;margin-bottom:10px">
+      <div style="color:var(--red2);font-size:12px;font-weight:600;margin-bottom:8px">🚨 긴급 등록</div>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none">
+        <input type="checkbox" id="force-urgent"
+          style="width:22px;height:22px;min-width:22px;accent-color:var(--red2);cursor:pointer;flex-shrink:0;border:none;padding:0;margin:0">
+        <span style="font-size:14px;font-weight:600;color:var(--red2)">긴급으로 변경</span>
+      </label>
+    </div>
     <button class="btn btn-red" onclick="doForceStatus()">⚡ 강제 변경</button>
     <button class="btn btn-outline" onclick="closeModal('modal-force')">취소</button>
   </div>
@@ -1800,17 +1808,19 @@ async function doCheckout() {
 // ============================================================
 function openForce(serial) {
   const r = allData.find(d => d['제조번호']===serial);
-  if (!r) return;
+  if (!r) { currentSerial = serial; document.getElementById('modal-force-info').innerHTML = `<div class="info-block"><b>${esc(serial)}</b></div>`; document.getElementById('force-status').value='대기'; document.getElementById('force-urgent').checked=false; openModal('modal-force'); return; }
   currentSerial = serial;
   document.getElementById('modal-force-info').innerHTML = infoBlock(r);
   document.getElementById('force-status').value = r['상태']||'대기';
+  document.getElementById('force-urgent').checked = r['긴급여부']==='Y';
   openModal('modal-force');
 }
 
 async function doForceStatus() {
   const status = document.getElementById('force-status').value;
+  const urgent = document.getElementById('force-urgent').checked;
   showToast('⏳ 처리 중...');
-  const res = await postAPI({ action:'forceStatus', serial:currentSerial, status });
+  const res = await postAPI({ action:'forceStatus', serial:currentSerial, status, urgent });
   if (res.success) { showToast('⚡ 상태 변경 완료','ok'); closeModal('modal-force'); await loadData(); }
   else showToast('❌ ' + res.error,'err');
 }
@@ -2077,15 +2087,22 @@ async function doSearch() {
         </div>
         ${json.history.map(r=>`
         <div class="history-item">
-          <div class="history-date">${formatDate(r['신청일시'])}</div>
-          <div class="history-content">
-            ${esc(r['기종명']||'')} ${esc(r['형식명']||'')}
-            ${r['고장부위']?`<span class="zone-tag">🎯 ${esc(r['고장부위'])}</span>`:''}
-            <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+            <div style="flex:1;min-width:0">
+              <div class="history-date">${formatDate(r['신청일시'])}</div>
+              <div class="history-content">
+                ${esc(r['기종명']||'')} ${esc(r['형식명']||'')}
+                ${r['고장부위']?`<span class="zone-tag">🎯 ${esc(r['고장부위'])}</span>`:''}
+                <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
+                ${r['긴급여부']==='Y'?`<span class="urgent-tag">🚨 긴급</span>`:''}
+              </div>
+              ${r['고장내용']?`<div class="history-detail">🔍 ${esc(r['고장내용'])}</div>`:''}
+              ${r['수리내역']?`<div class="history-detail">🔧 ${esc(r['수리내역'])}</div>`:''}
+              ${r['수요자명']?`<div class="history-detail">👤 ${esc(r['수요자명'])}</div>`:''}
+            </div>
+            ${(ROLE==='chief'||ROLE==='factory')&&r['상태']!=='출고'?`
+            <button class="btn-sm r" style="flex-shrink:0" onclick="openForce('${esc(r['제조번호'])}')">⚡</button>`:''}
           </div>
-          ${r['고장내용']?`<div class="history-detail">🔍 ${esc(r['고장내용'])}</div>`:''}
-          ${r['수리내역']?`<div class="history-detail">🔧 ${esc(r['수리내역'])}</div>`:''}
-          ${r['수요자명']?`<div class="history-detail">👤 ${esc(r['수요자명'])}</div>`:''}
         </div>`).join('')}
       </div>`;
   } catch(e) {
