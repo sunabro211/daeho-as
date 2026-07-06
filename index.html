@@ -856,7 +856,7 @@ function renderIn() {
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none">
         <input type="checkbox" id="in-urgent"
           style="width:22px;height:22px;min-width:22px;accent-color:var(--red2);cursor:pointer;flex-shrink:0;border:none;padding:0;margin:0">
-        <span style="font-size:14px;font-weight:600;color:var(--red2)">긴급으로 등록</span>
+        <span style="font-size:14px;font-weight:600;color:var(--red2)">긴급으로 신청</span>
       </label>
     </div>` : ''}
 
@@ -877,7 +877,7 @@ function renderIn() {
     <!-- 메모 -->
     <div class="ig">
       <label>📝 메모 <span class="opt">(선택)</span></label>
-      <textarea id="in-memo" rows="2" placeholder="고장내용 / 기타 특이사항"></textarea>
+      <textarea id="in-memo" rows="2" placeholder="보증기간 내 / 재발 AS / 기타 특이사항"></textarea>
     </div>
 
     <button class="btn btn-green" onclick="doRegister()">
@@ -890,8 +890,8 @@ function renderIn() {
 function renderWait() {
   let filtered;
   if (ROLE==='admin' || ROLE==='chief' || ROLE==='factory') {
-    // 관리자/부서장: 신청 상태만 (입고 확정 필요)
-    filtered = allData.filter(r => r['상태']==='신청');
+    // 관리자/부서장: 신청(입고확정 필요) + 대기(AS시작 대기) 모두 표시
+    filtered = allData.filter(r => r['상태']==='신청' || r['상태']==='대기');
   } else if (ROLE==='as') {
     // AS팀장: 대기 상태만 (AS 시작 필요)
     filtered = allData.filter(r => r['상태']==='대기');
@@ -905,23 +905,40 @@ function renderWait() {
   const urgent = filtered.filter(r => r['긴급여부']==='Y');
   const normal = filtered.filter(r => r['긴급여부']!=='Y');
 
-  let html = '';
+  // 관리자/부서장: 신청/대기 섹션 구분
+  const normalReq  = normal.filter(r => r['상태']==='신청');
+  const normalWait = normal.filter(r => r['상태']==='대기');
 
-  if (ROLE==='admin'||ROLE==='chief'||ROLE==='factory') {
-    html += `<div class="notice-box nb-blue" style="margin-bottom:12px">📥 입고 확정이 필요한 신청 건입니다</div>`;
-  } else if (ROLE==='as') {
-    html += `<div class="notice-box nb-blue" style="margin-bottom:12px">🔧 AS 시작 대기 중인 기계입니다</div>`;
-  }
+  let html = '';
 
   if (urgent.length) {
     html += `<div class="alert-banner">🚨 긴급 AS ${urgent.length}건!</div>`;
     html += `<div class="sec-label">🚨 긴급</div>`;
     urgent.forEach(r => { html += listItem(r, true); });
   }
-  if (normal.length) {
-    html += `<div class="sec-label" style="margin-top:${urgent.length?'12px':'0'}">대기 · ${normal.length}건</div>`;
-    normal.forEach((r, i) => { html += listItem(r, false, i+1); });
+
+  if (ROLE==='admin'||ROLE==='chief'||ROLE==='factory') {
+    if (normalReq.length) {
+      html += `<div class="notice-box nb-red" style="margin:${urgent.length?'12px':'0'} 0 8px">📥 입고 확정 필요 · ${normalReq.length}건</div>`;
+      normalReq.forEach((r,i) => { html += listItem(r, false, i+1); });
+    }
+    if (normalWait.length) {
+      html += `<div class="notice-box nb-blue" style="margin:${normalReq.length?'12px':'0'} 0 8px">⏳ AS 시작 대기 · ${normalWait.length}건</div>`;
+      normalWait.forEach((r,i) => { html += listItem(r, false, i+1); });
+    }
+  } else if (ROLE==='as') {
+    html += `<div class="notice-box nb-blue" style="margin-bottom:12px">🔧 AS 시작 대기 중인 기계입니다</div>`;
+    if (normal.length) {
+      html += `<div class="sec-label">대기 · ${normal.length}건</div>`;
+      normal.forEach((r,i) => { html += listItem(r, false, i+1); });
+    }
+  } else {
+    if (normal.length) {
+      html += `<div class="sec-label" style="margin-top:${urgent.length?'12px':'0'}">대기 · ${normal.length}건</div>`;
+      normal.forEach((r,i) => { html += listItem(r, false, i+1); });
+    }
   }
+
   if (!filtered.length) {
     html = `<div class="empty"><div class="empty-icon">✅</div><p>대기 중인 기계가 없어요</p></div>`;
   }
