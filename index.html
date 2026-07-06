@@ -1355,7 +1355,7 @@ function listItem(r, isUrgent, num) {
           <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
         </div>
         <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
-          ${(isAdminLike || isAs) && (r['상태']==='신청'||r['상태']==='대기')
+          ${(isAdminLike || isAs) && r['상태']==='신청'
             ? `<button class="btn-sm g" onclick="openCheckin('${serial}')">📥 입고 확정</button>` : ''}
           ${isAs && r['상태']==='대기'
             ? `<button class="btn-sm b" onclick="openStartAS('${serial}')">🔧 AS 시작</button>` : ''}
