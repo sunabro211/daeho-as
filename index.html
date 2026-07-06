@@ -851,11 +851,11 @@ function renderIn() {
 
     <!-- 긴급 (부서장/공장장만) -->
     ${isChief ? `
-    <div class="ig" style="background:var(--red3);border-radius:10px;padding:12px">
-      <label style="color:var(--red2);margin-bottom:8px;display:block">🚨 긴급 AS (부서장/공장장 전용)</label>
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+    <div style="background:var(--red3);border-radius:10px;padding:12px;margin-bottom:10px">
+      <div style="color:var(--red2);font-size:12px;font-weight:600;margin-bottom:8px">🚨 긴급 AS (부서장/공장장 전용)</div>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none">
         <input type="checkbox" id="in-urgent"
-          style="width:22px;height:22px;accent-color:var(--red2);cursor:pointer">
+          style="width:22px;height:22px;min-width:22px;accent-color:var(--red2);cursor:pointer;flex-shrink:0;border:none;padding:0;margin:0">
         <span style="font-size:14px;font-weight:600;color:var(--red2)">긴급으로 신청</span>
       </label>
     </div>` : ''}
