@@ -520,6 +520,19 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
   </div>
 </div>
 
+<!-- 삭제 확인 모달 -->
+<div class="modal-bg" id="modal-delete">
+  <div class="modal">
+    <h3>🗑 신청 삭제
+      <button class="modal-close" onclick="closeModal('modal-delete')">✕</button>
+    </h3>
+    <div class="notice-box nb-red" style="margin-bottom:12px">⚠️ 삭제하면 복구할 수 없어요. 신중하게 확인해주세요.</div>
+    <div class="info-block" id="modal-delete-info"></div>
+    <button class="btn btn-red" onclick="doDelete()">🗑 삭제 확인</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-delete')">취소</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <footer style="width:100%;text-align:center;padding:20px;font-size:11px;color:var(--gray4);margin-top:auto">
@@ -536,7 +549,7 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 const API = 'https://script.google.com/macros/s/AKfycbzYSvJo-ikW86pCOYUxtw_DXxCwopQ6JKSUEiYqLuuYsnZsDU2VfFneaEJPwglkxtdvGw/exec';
 const ACCESS_KEY = new URLSearchParams(location.search).get('k') || '';
 
-// ── 접근 키 → 역할 매핑 (고정 9개. 직원 링크는 whoami로 서버 확인) ──
+// ── 접근 키 → 역할 매핑 (고정. 직원 링크는 whoami로 서버 확인) ──
 const KEY_ROLE_MAP = {
   'dh-chief-9271':   'chief',
   'dh-factory-4853': 'factory',
@@ -547,24 +560,28 @@ const KEY_ROLE_MAP = {
   'dh-t4-3391':      'team4',
   'dh-t5-6614':      'team5',
   'dh-t6-1072':      'team6',
+  'dh-rd-4429':      'teamrd',   // 로보드림 팀장
+  'dh-view-8801':    'viewer',   // 사무실 조회 전용 (읽기 전용)
 };
 
 // ── 역할 정보 ──
 const ROLE_INFO = {
-  chief:    { name:'영업부서장',      label:'부서장 화면',  tabs:['in','wait','progress','done','history','stats'] },
-  factory:  { name:'공장장',          label:'공장장 화면',  tabs:['in','wait','progress','done','history','stats'] },
-  admin:    { name:'Suneth (관리자)', label:'관리자 화면',  tabs:['in','wait','progress','done','history','stats'] },
-  as:       { name:'AS팀장',          label:'AS팀장 화면',  tabs:['wait','progress','done','history'] },
-  team1:    { name:'1팀 팀장',        label:'1팀 입고신청', tabs:['in','myteam','history'] },
-  team3:    { name:'3팀 팀장',        label:'3팀 입고신청', tabs:['in','myteam','history'] },
-  team4:    { name:'4팀 팀장',        label:'4팀 입고신청', tabs:['in','myteam','history'] },
-  team5:    { name:'5팀 팀장',        label:'5팀 입고신청', tabs:['in','myteam','history'] },
-  team6:    { name:'6팀 팀장',        label:'6팀 입고신청', tabs:['in','myteam','history'] },
-  employee: { name:'직원',            label:'직원 화면',    tabs:['in','myteam','history'] },
+  chief:    { name:'영업부서장',      label:'부서장 화면',       tabs:['in','wait','progress','done','history','stats'] },
+  factory:  { name:'공장장',          label:'공장장 화면',       tabs:['in','wait','progress','done','history','stats'] },
+  admin:    { name:'Suneth (관리자)', label:'관리자 화면',       tabs:['in','wait','progress','done','history','stats'] },
+  as:       { name:'AS팀장',          label:'AS팀장 화면',       tabs:['in','wait','progress','done','history'] },
+  team1:    { name:'1팀 팀장',        label:'1팀 입고신청',      tabs:['in','myteam','history'] },
+  team3:    { name:'3팀 팀장',        label:'3팀 입고신청',      tabs:['in','myteam','history'] },
+  team4:    { name:'4팀 팀장',        label:'4팀 입고신청',      tabs:['in','myteam','history'] },
+  team5:    { name:'5팀 팀장',        label:'5팀 입고신청',      tabs:['in','myteam','history'] },
+  team6:    { name:'6팀 팀장',        label:'6팀 입고신청',      tabs:['in','myteam','history'] },
+  teamrd:   { name:'로보드림 팀장',   label:'로보드림 입고신청', tabs:['in','myteam','history'] },
+  viewer:   { name:'사무실 조회',     label:'전체 조회 (읽기전용)', tabs:['wait','progress','done','history','stats'] },
+  employee: { name:'직원',            label:'직원 화면',         tabs:['in','myteam','history'] },
 };
 
 // ── 팀 역할 → 팀 이름 ──
-const TEAM_MAP = { team1:'1팀', team3:'3팀', team4:'4팀', team5:'5팀', team6:'6팀' };
+const TEAM_MAP = { team1:'1팀', team3:'3팀', team4:'4팀', team5:'5팀', team6:'6팀', teamrd:'로보드림' };
 
 // ── 고장 부위 목록 ──
 const FAULT_ZONES = ['기어박스','입력축','칼축','칼날','체인','벨트','오일씰','베어링','볼트/너트','기타'];
@@ -637,6 +654,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function isAdminLike() { return ROLE==='admin'||ROLE==='chief'||ROLE==='factory'; }
 function isTeamRole()  { return ROLE.startsWith('team') || ROLE==='employee'; }
+function isViewer()    { return ROLE==='viewer'; }
 
 async function loadSettings() {
   try {
@@ -766,6 +784,18 @@ function renderScreen(tab) {
     case 'stats':    c.innerHTML = renderStats();    break;
     case 'myteam':   c.innerHTML = renderMyTeam();   loadStaffList().then(renderMyTeamStaffSection); break;
     default:         c.innerHTML = '<div class="empty"><div class="empty-icon">🚧</div><p>준비 중</p></div>';
+  }
+  // 조회 전용 모드: 버튼 전부 비활성화
+  if (isViewer()) {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:#FFF3CD;border-left:4px solid #FFC107;padding:10px 14px;font-size:12px;color:#856404;margin-bottom:8px;border-radius:0 8px 8px 0';
+    banner.textContent = '👁 조회 전용 모드 — 입력·수정 기능은 사용할 수 없어요';
+    c.insertBefore(banner, c.firstChild);
+    c.querySelectorAll('button').forEach(btn => {
+      if (!btn.classList.contains('filter-btn') && !btn.classList.contains('modal-close')) {
+        btn.disabled = true; btn.style.opacity='0.35'; btn.style.pointerEvents='none';
+      }
+    });
   }
 }
 
@@ -1241,6 +1271,12 @@ function renderMyTeam() {
       ${r['고장내용']?`<div style="font-size:12px;color:var(--gray2);margin-top:6px">🔍 ${esc(r['고장내용'])}</div>`:''}
       ${r['수리내역']?`<div style="font-size:12px;color:var(--gray2);margin-top:4px">🔧 ${esc(r['수리내역'])}</div>`:''}
       <div style="font-size:11px;color:var(--gray3);margin-top:8px">신청: ${formatDate(r['신청일시'])}</div>
+      ${r['상태']==='신청' ? `
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn-sm b" onclick="openEditInfo('${esc(r['제조번호'])}')">✏️ 수정</button>
+        <button class="btn-sm r" onclick="confirmDelete('${esc(r['제조번호'])}','신청')">🗑 삭제</button>
+      </div>` : (r['상태']==='대기'||r['상태']==='AS중') ? `
+      <div style="font-size:11px;color:var(--gray4);margin-top:6px">입고 후 변경은 부서장/관리자에게 요청</div>` : ''}
     </div>`).join('')}`;
 }
 
@@ -2071,6 +2107,26 @@ async function removeTeamSetting(value) {
   const res = await postAPI({ action:'removeTeam', value });
   if (res.success) { TEAMS_LIST = TEAMS_LIST.filter(t=>t!==value); renderSettingsTeamsSection(); showToast('🗑 삭제됨','ok'); }
   else showToast('❌ ' + res.error,'err');
+}
+
+// ============================================================
+// 삭제 기능 (팀장: 신청 상태만 / 관리자·부서장: 신청+대기 상태)
+// ============================================================
+function confirmDelete(serial, status) {
+  const r = allData.find(d => d['제조번호']===serial);
+  currentSerial = serial;
+  document.getElementById('modal-delete-info').innerHTML = r ? infoBlock(r) : `<div class="info-block"><b>${esc(serial)}</b></div>`;
+  openModal('modal-delete');
+}
+
+async function doDelete() {
+  showToast('⏳ 삭제 중...');
+  const res = await postAPI({ action:'deleteRecord', serial:currentSerial });
+  if (res.success) {
+    showToast('🗑 삭제되었습니다','ok');
+    closeModal('modal-delete');
+    await loadData();
+  } else showToast('❌ ' + res.error,'err');
 }
 
 // ============================================================
