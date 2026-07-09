@@ -156,7 +156,13 @@ footer{text-align:center;padding:20px;font-size:11px;color:var(--gray4)}
 
 <script>
 const API = 'https://script.google.com/macros/s/AKfycbzYSvJo-ikW86pCOYUxtw_DXxCwopQ6JKSUEiYqLuuYsnZsDU2VfFneaEJPwglkxtdvGw/exec';
-const CEO_KEYS = ['dh-ceo-1119','dh-chief-9271','dh-factory-4853','dh-admin-7364'];
+// 프론트엔드에서 허용하는 키 목록 (추가 보안층)
+const ALLOWED_KEYS = [
+  'dh-ceo-1119',    // 사장님 전용
+  'dh-chief-9271',  // 영업부서장
+  'dh-factory-4853',// 공장장
+  'dh-admin-7364',  // 관리자
+];
 const ACCESS_KEY = new URLSearchParams(location.search).get('k') || '';
 
 // 날짜 표시
@@ -447,10 +453,29 @@ async function loadAndRender(){
 }
 
 async function init(){
-  if(!CEO_KEYS.includes(ACCESS_KEY)){
-    document.getElementById('wrap').innerHTML=`<div class="locked"><div class="icon">🔒</div><p>접근 권한이 없습니다</p></div>`;
+  if(!ACCESS_KEY){
+    document.getElementById('wrap').innerHTML=`<div class="locked"><div class="icon">🔒</div><p>링크에 접근 키가 없습니다<br><small style="font-size:11px;color:var(--gray4)">?k= 파라미터를 확인해주세요</small></p></div>`;
     return;
   }
+
+  // 프론트 허용 키 목록 + API whoami 이중 체크
+  let allowed = false;
+  if(ALLOWED_KEYS.includes(ACCESS_KEY)){
+    allowed = true;
+  } else {
+    // 허용 키 목록에 없어도 API에서 admin급 역할이면 허용
+    try {
+      const res = await fetch(`${API}?action=whoami&k=${ACCESS_KEY}`);
+      const json = await res.json();
+      if(json.success && ['chief','factory','admin'].includes(json.role)) allowed = true;
+    } catch(e){}
+  }
+
+  if(!allowed){
+    document.getElementById('wrap').innerHTML=`<div class="locked"><div class="icon">🔒</div><p>접근 권한이 없습니다<br><small style="font-size:11px;color:var(--gray4)">부서장·공장장·관리자 계정으로 접속하세요</small></p></div>`;
+    return;
+  }
+
   await loadAndRender();
   // 5분마다 자동 갱신
   setInterval(loadAndRender, 5*60*1000);
