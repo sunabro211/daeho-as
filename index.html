@@ -1399,6 +1399,8 @@ function listItem(r, isUrgent, num) {
             ? `<button class="btn-sm p" onclick="openMissing('${serial}')">📝 정보입력</button>` : ''}
           ${(isAdminLike || isTeamRole()) && (r['상태']==='신청'||r['상태']==='대기')
             ? `<button class="btn-sm b" onclick="openEditInfo('${serial}')">✏️ 정보수정</button>` : ''}
+          ${isAdminLike && ['신청','대기','AS중','완료'].includes(r['상태'])
+            ? `<button class="btn-sm r" onclick="confirmDelete('${serial}','${r['상태']}')">🗑 삭제</button>` : ''}
           ${(ROLE==='chief'||ROLE==='factory')
             ? `<button class="btn-sm r" onclick="openForce('${serial}')">⚡ 강제변경</button>` : ''}
         </div>
