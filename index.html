@@ -670,11 +670,21 @@ async function loadSettings() {
 function showSettingsGear() {
   const chip = document.querySelector('.role-chip');
   if (!chip) return;
+  // ⚙️ 설정 버튼
   const btn = document.createElement('button');
   btn.textContent = '⚙️';
   btn.style.cssText = 'background:none;border:none;color:white;font-size:15px;cursor:pointer;margin-left:6px;padding:0';
   btn.onclick = openSettingsPanel;
   chip.appendChild(btn);
+  // 📊 대시보드 버튼 (관리자급만)
+  if (isAdminLike()) {
+    const dash = document.createElement('button');
+    dash.textContent = '📊';
+    dash.title = '실시간 대시보드';
+    dash.style.cssText = 'background:none;border:none;color:white;font-size:15px;cursor:pointer;margin-left:4px;padding:0';
+    dash.onclick = () => window.open(`ceo.html?k=${ACCESS_KEY}`, '_blank');
+    chip.appendChild(dash);
+  }
 }
 
 // PWA manifest 동적 업데이트
@@ -1147,6 +1157,13 @@ function renderStats() {
   const typeColors = ['#2E7D32','#43A047','#66BB6A','#A5D6A7'];
 
   return `
+  ${isAdminLike() ? `
+  <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+    <button onclick="window.open('ceo.html?k=${ACCESS_KEY}','_blank')"
+      style="display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,#1B5E20,#2E7D32);color:white;border:none;border-radius:20px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(46,125,50,.3)">
+      📊 실시간 대시보드 열기
+    </button>
+  </div>` : ''}
   <div class="card">
     <div class="card-title">📊 전체 현황</div>
     <div class="stat-grid">
