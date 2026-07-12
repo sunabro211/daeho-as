@@ -592,6 +592,12 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
       <input type="text" id="settings-new-team" placeholder="새 영업팀 (예: 7팀)">
       <button onclick="addTeamSetting()">+ 추가</button>
     </div>
+    <div class="card-title">🎯 고장부위 관리</div>
+    <div id="settings-zones-list" style="margin-bottom:10px"></div>
+    <div class="add-part-row" style="margin-bottom:16px">
+      <input type="text" id="settings-new-zone" placeholder="새 고장부위 (예: 프레임)">
+      <button onclick="addZoneSetting()">+ 추가</button>
+    </div>
     <div class="card-title">🧑‍🔧 전체 직원</div>
     <div id="settings-staff-list"></div>
     <button class="btn btn-outline" onclick="closeModal('modal-settings')" style="margin-top:10px">닫기</button>
@@ -736,6 +742,7 @@ let qrScanner = null;
 let _toastTimer = null;
 let TYPES_LIST = ['로터 베이터'];
 let TEAMS_LIST = ['1팀','3팀','4팀','5팀','6팀'];
+let ZONES_LIST = ['기어박스','입력축','칼축','칼날','체인','벨트','오일씰','베어링','볼트/너트','기타'];
 let staffList = [];
 let usedPartsAll = [];
 
@@ -797,6 +804,7 @@ async function loadSettings() {
     if (json.success) {
       if (json.types?.length) TYPES_LIST = json.types;
       if (json.teams?.length) TEAMS_LIST = json.teams;
+      if (json.zones?.length) ZONES_LIST = json.zones;
     }
   } catch(e) { /* 기본값 사용 */ }
 }
@@ -1287,11 +1295,21 @@ function renderStats() {
   const total = allData.length;
   const byStatus={}, byType={}, byTeam={}, byZone={};
 
+  // 기기별×부위별 교차 집계
+  const crossMap = {}; // { '형식명': { '고장부위': count } }
+  const allZones = new Set();
+  const allTypes = new Set();
+
   allData.forEach(r => {
     byStatus[r['상태']] = (byStatus[r['상태']]||0)+1;
-    if (r['형식명'])   byType[r['형식명']]   = (byType[r['형식명']]||0)+1;
+    if (r['형식명'])   { byType[r['형식명']]   = (byType[r['형식명']]||0)+1; allTypes.add(r['형식명']); }
     if (r['영업팀'])   byTeam[r['영업팀']]   = (byTeam[r['영업팀']]||0)+1;
-    if (r['고장부위']) byZone[r['고장부위']] = (byZone[r['고장부위']]||0)+1;
+    if (r['고장부위']) { byZone[r['고장부위']] = (byZone[r['고장부위']]||0)+1; allZones.add(r['고장부위']); }
+
+    if (r['형식명'] && r['고장부위']) {
+      if (!crossMap[r['형식명']]) crossMap[r['형식명']] = {};
+      crossMap[r['형식명']][r['고장부위']] = (crossMap[r['형식명']][r['고장부위']]||0)+1;
+    }
   });
 
   const completed = allData.filter(r => Number(r['소요일수'])>0);
@@ -1302,6 +1320,47 @@ function renderStats() {
   const maxTeam = Math.max(...Object.values(byTeam), 1);
   const maxZone = Math.max(...Object.values(byZone), 1);
   const typeColors = ['#2E7D32','#43A047','#66BB6A','#A5D6A7'];
+
+  // 교차 분석 테이블 생성
+  const typeList = [...allTypes].sort();
+  const zoneList = Object.entries(byZone).sort((a,b)=>b[1]-a[1]).map(e=>e[0]); // 많은 순
+  const maxCross = Math.max(...typeList.flatMap(t => zoneList.map(z => crossMap[t]?.[z]||0)), 1);
+
+  const crossTable = typeList.length && zoneList.length ? `
+  <div class="card" style="overflow-x:auto">
+    <div class="card-title">📊 기기별 × 부위별 고장 분석</div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px;min-width:360px">
+      <thead>
+        <tr>
+          <th style="background:#E8F5E9;padding:7px 8px;border:1px solid #C8E6C9;font-weight:700;color:#1B5E20;text-align:left;white-space:nowrap">형식명</th>
+          ${zoneList.map(z=>`<th style="background:#E8F5E9;padding:7px 6px;border:1px solid #C8E6C9;font-weight:700;color:#1B5E20;text-align:center;white-space:nowrap">${esc(z)}</th>`).join('')}
+          <th style="background:#E8F5E9;padding:7px 8px;border:1px solid #C8E6C9;font-weight:700;color:#1B5E20;text-align:center">합계</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${typeList.map(t => {
+          const rowTotal = zoneList.reduce((s,z)=>s+(crossMap[t]?.[z]||0),0);
+          return `<tr>
+            <td style="padding:7px 8px;border:1px solid #E0E0E0;font-weight:700;color:var(--gray1);white-space:nowrap">${esc(t)}</td>
+            ${zoneList.map(z => {
+              const cnt = crossMap[t]?.[z]||0;
+              const pct = Math.round(cnt/maxCross*100);
+              const bg = cnt===0 ? '#FAFAFA' : `rgba(46,125,50,${(pct/100*0.7+0.1).toFixed(2)})`;
+              const color = pct>50 ? 'white' : 'var(--gray1)';
+              return `<td style="padding:7px 6px;border:1px solid #E0E0E0;text-align:center;background:${bg};color:${color};font-weight:${cnt>0?'700':'400'}">${cnt>0?cnt:'-'}</td>`;
+            }).join('')}
+            <td style="padding:7px 8px;border:1px solid #E0E0E0;text-align:center;font-weight:900;color:var(--green2)">${rowTotal}</td>
+          </tr>`;
+        }).join('')}
+        <tr style="background:#E8F5E9">
+          <td style="padding:7px 8px;border:1px solid #C8E6C9;font-weight:700;color:#1B5E20">합계</td>
+          ${zoneList.map(z=>`<td style="padding:7px 6px;border:1px solid #C8E6C9;text-align:center;font-weight:700;color:#1B5E20">${byZone[z]||0}</td>`).join('')}
+          <td style="padding:7px 8px;border:1px solid #C8E6C9;text-align:center;font-weight:900;color:#1B5E20">${Object.values(byZone).reduce((s,v)=>s+v,0)}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="font-size:10px;color:var(--gray4);margin-top:6px">※ 색이 진할수록 고장 빈도가 높아요</div>
+  </div>` : '';
 
   return `
   ${isAdminLike() ? `
@@ -1326,6 +1385,8 @@ function renderStats() {
       <div class="stat-box g"><div class="stat-num">${byStatus['완료']||0}</div><div class="stat-lbl">출고대기</div></div>
     </div>
   </div>
+
+  ${crossTable}
 
   ${Object.keys(byZone).length ? `
   <div class="card">
@@ -1353,15 +1414,10 @@ function renderStats() {
     ${Object.entries(byTeam).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
     <div class="bar-row">
       <span class="bar-label">${esc(k)}</span>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxTeam*100)}%;background:var(--blue2)">${esc(k)}</div></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxTeam*100)}%;background:var(--blue2)">${v}</div></div>
       <span class="bar-count">${v}</span>
     </div>`).join('')||'<div style="color:var(--gray4);font-size:12px">데이터 없음</div>'}
-  </div>
-
-  ${(ROLE==='chief'||ROLE==='factory'||ROLE==='admin') ? `
-  <button class="btn btn-green" onclick="showToast('📥 구글 시트 → 파일 → 다운로드 → xlsx','ok')">
-    📥 엑셀 다운로드 안내
-  </button>` : ''}`;
+  </div>`;
 }
 
 // ── 우리팀 화면 (영업팀장) ──
@@ -2376,6 +2432,7 @@ async function openSettingsPanel() {
   openModal('modal-settings');
   renderSettingsTypesSection();
   renderSettingsTeamsSection();
+  renderSettingsZonesSection();
   if (isAdminLike()) { await loadStaffList(); renderSettingsStaffSection(); }
   else document.getElementById('settings-staff-list').innerHTML = `<div style="color:var(--gray4);font-size:12px">부서장/공장장/관리자만 전체 직원을 볼 수 있어요</div>`;
 }
@@ -2402,6 +2459,28 @@ function renderSettingsStaffSection() {
   el.innerHTML = staffListHTML(staffList, true);
 }
 
+function renderSettingsZonesSection() {
+  const el = document.getElementById('settings-zones-list');
+  if (!el) return;
+  el.innerHTML = ZONES_LIST.map(z=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #EEE">
+      <span style="font-size:13px">🎯 ${esc(z)}</span>
+      <button class="btn-sm r" onclick="removeZoneSetting('${esc(z)}')">삭제</button>
+    </div>`).join('');
+}
+async function addZoneSetting() {
+  const input = document.getElementById('settings-new-zone');
+  const value = (input.value||'').trim();
+  if (!value) return;
+  const res = await postAPI({ action:'addZone', value });
+  if (res.success) { ZONES_LIST.push(value); input.value=''; renderSettingsZonesSection(); showToast('✅ 추가됨','ok'); }
+  else showToast('❌ ' + res.error,'err');
+}
+async function removeZoneSetting(value) {
+  const res = await postAPI({ action:'removeZone', value });
+  if (res.success) { ZONES_LIST = ZONES_LIST.filter(z=>z!==value); renderSettingsZonesSection(); showToast('🗑 삭제됨','ok'); }
+  else showToast('❌ ' + res.error,'err');
+}
 async function addTypeSetting() {
   const input = document.getElementById('settings-new-type');
   const value = (input.value||'').trim();
@@ -2524,6 +2603,35 @@ function downloadExcel() {
     ws['!cols'] = cols.map(c => ({wch: c.key.includes('내용')||c.key.includes('내역')||c.key==='메모' ? 22 : c.key.includes('일시') ? 18 : 12}));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'AS관리대장');
+
+    // ── 2시트: 기기별×부위별 교차 분석 ──
+    const crossMap2 = {};
+    const allTypes2 = new Set();
+    const allZones2 = new Set();
+    allData.forEach(r => {
+      if (r['형식명']) allTypes2.add(r['형식명']);
+      if (r['고장부위']) allZones2.add(r['고장부위']);
+      if (r['형식명'] && r['고장부위']) {
+        if (!crossMap2[r['형식명']]) crossMap2[r['형식명']] = {};
+        crossMap2[r['형식명']][r['고장부위']] = (crossMap2[r['형식명']][r['고장부위']]||0)+1;
+      }
+    });
+    const tList = [...allTypes2].sort();
+    const zList = [...allZones2].sort();
+    if (tList.length && zList.length) {
+      const crossRows = [
+        ['형식명', ...zList, '합계'],
+        ...tList.map(t => {
+          const rowTotal = zList.reduce((s,z)=>s+(crossMap2[t]?.[z]||0),0);
+          return [t, ...zList.map(z=>crossMap2[t]?.[z]||0), rowTotal];
+        }),
+        ['합계', ...zList.map(z=>allData.filter(r=>r['고장부위']===z).length),
+          allData.filter(r=>r['고장부위']).length]
+      ];
+      const ws2 = XLSX.utils.aoa_to_sheet(crossRows);
+      ws2['!cols'] = [{wch:10}, ...zList.map(()=>({wch:10})), {wch:8}];
+      XLSX.utils.book_append_sheet(wb, ws2, '기기별_부위별_분석');
+    }
     const today = new Date();
     const fname = `대호AS관리_${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}.xlsx`;
     XLSX.writeFile(wb, fname);
@@ -2644,9 +2752,9 @@ async function addNewPart() {
 function renderZoneGrid(gridId, hiddenId, selected) {
   const grid = document.getElementById(gridId);
   if (!grid) return;
-  grid.innerHTML = FAULT_ZONES.map(z=>`
+  grid.innerHTML = ZONES_LIST.map(z=>`
     <button class="zone-btn ${z===selected?'selected':''}"
-      onclick="selectZone('${gridId}','${hiddenId}','${z}',this)">
+      onclick="selectZone('${gridId}','${hiddenId}','${esc(z)}',this)">
       ${esc(z)}
     </button>`).join('');
 }
