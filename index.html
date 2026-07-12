@@ -1073,9 +1073,10 @@ function renderIn() {
     <button class="btn btn-green" onclick="doRegister()">
       ${isTeam ? '📋 입고 신청하기' : '📥 입고 등록'}
     </button>
+    ${isTeamRole() ? `
     <button class="btn" style="background:#E0F2F1;color:#00796B;border:none;margin-top:0" onclick="openFieldRegister()">
       🛠 현장처리로 등록
-    </button>
+    </button>` : ''}
   </div>`;
 }
 
