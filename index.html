@@ -13,6 +13,8 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <!-- QR 스캔 라이브러리 -->
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<!-- SheetJS 엑셀 생성 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 /* ============================================================
    대호주식회사 영업부 AS 관리시스템
@@ -808,7 +810,7 @@ function showSettingsGear() {
   btn.style.cssText = 'background:none;border:none;color:white;font-size:15px;cursor:pointer;margin-left:6px;padding:0';
   btn.onclick = openSettingsPanel;
   chip.appendChild(btn);
-  // 📊 대시보드 버튼 (관리자급만)
+  // 관리자급만: 📊 대시보드 + ⬇️ 엑셀 버튼
   if (isAdminLike()) {
     const dash = document.createElement('button');
     dash.textContent = '📊';
@@ -816,6 +818,13 @@ function showSettingsGear() {
     dash.style.cssText = 'background:none;border:none;color:white;font-size:15px;cursor:pointer;margin-left:4px;padding:0';
     dash.onclick = () => window.open(`ceo.html?k=${ACCESS_KEY}`, '_blank');
     chip.appendChild(dash);
+
+    const xl = document.createElement('button');
+    xl.textContent = '⬇️';
+    xl.title = '엑셀 다운로드';
+    xl.style.cssText = 'background:none;border:none;color:white;font-size:15px;cursor:pointer;margin-left:4px;padding:0';
+    xl.onclick = downloadExcel;
+    chip.appendChild(xl);
   }
 }
 
@@ -1295,7 +1304,11 @@ function renderStats() {
 
   return `
   ${isAdminLike() ? `
-  <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+  <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px">
+    <button onclick="downloadExcel()"
+      style="display:flex;align-items:center;gap:6px;background:white;color:#1D6F42;border:1.5px solid #1D6F42;border-radius:20px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">
+      ⬇️ 엑셀 다운로드
+    </button>
     <button onclick="window.open('ceo.html?k=${ACCESS_KEY}','_blank')"
       style="display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,#1B5E20,#2E7D32);color:white;border:none;border-radius:20px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(46,125,50,.3)">
       📊 실시간 대시보드 열기
@@ -2475,6 +2488,52 @@ async function doFieldRegister() {
   } else showToast('❌ ' + res.error,'err');
 }
 
+// ============================================================
+// ============================================================
+// 엑셀 다운로드 (요청 시 즉시 생성)
+// ============================================================
+function downloadExcel() {
+  if (!allData || !allData.length) { showToast('데이터가 없어요','err'); return; }
+  showToast('⏳ 엑셀 생성 중...');
+  try {
+    const cols = [
+      {key:'제조번호',label:'제조번호'},{key:'기종명',label:'기종명'},{key:'형식명',label:'형식명'},
+      {key:'영업팀',label:'영업팀'},{key:'상태',label:'상태'},{key:'긴급여부',label:'긴급'},
+      {key:'수요자명',label:'수요자명'},{key:'지역',label:'지역'},{key:'고장부위',label:'고장부위'},
+      {key:'고장내용',label:'고장내용'},{key:'수리내역',label:'수리내역'},{key:'담당팀장',label:'담당팀장'},
+      {key:'신청일시',label:'신청일시'},{key:'입고일시',label:'입고일시'},
+      {key:'완료일시',label:'완료일시'},{key:'출고일시',label:'출고일시'},
+      {key:'소요일수',label:'소요일수(일)'},{key:'입고부품체크',label:'입고부품'},{key:'메모',label:'메모'},
+    ];
+    const fmtDate = v => {
+      if (!v) return '';
+      const d = new Date(v);
+      if (isNaN(d)) return v;
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    };
+    const rows = allData.map(r => {
+      const row = {};
+      cols.forEach(c => {
+        const v = r[c.key]||'';
+        row[c.label] = c.key.includes('일시') ? fmtDate(v) : v;
+      });
+      return row;
+    });
+    const ws = XLSX.utils.json_to_sheet(rows, {header: cols.map(c=>c.label)});
+    ws['!cols'] = cols.map(c => ({wch: c.key.includes('내용')||c.key.includes('내역')||c.key==='메모' ? 22 : c.key.includes('일시') ? 18 : 12}));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'AS관리대장');
+    const today = new Date();
+    const fname = `대호AS관리_${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}.xlsx`;
+    XLSX.writeFile(wb, fname);
+    showToast('✅ 엑셀 다운로드 완료','ok');
+  } catch(e) {
+    showToast('❌ 다운로드 실패: '+e.message,'err');
+  }
+}
+
+// ============================================================
+// 이력 조회
 // ============================================================
 async function doSearch() {
   const input  = document.getElementById('search-serial');
