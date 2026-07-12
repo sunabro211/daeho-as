@@ -93,6 +93,7 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 .s-ing{background:var(--blue3);color:var(--blue2)}
 .s-done{background:var(--green4);color:var(--green2)}
 .s-out{background:var(--gray5);color:var(--gray3)}
+.s-field{background:#E0F2F1;color:#00796B}
 .urgent-tag{background:var(--red3);color:var(--red2);font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px}
 .zone-tag{background:var(--gold2);color:var(--gold);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
 
@@ -533,6 +534,60 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
   </div>
 </div>
 
+<!-- 현장처리 모달 -->
+<div class="modal-bg" id="modal-field">
+  <div class="modal">
+    <h3>🛠 현장처리 등록
+      <button class="modal-close" onclick="closeModal('modal-field')">✕</button>
+    </h3>
+    <div class="notice-box nb-blue" style="margin-bottom:12px">본사 입고 없이 현장에서 직접 처리한 건을 등록해요</div>
+    <div class="ig">
+      <label>제조번호 <span style="color:var(--red2)">*</span></label>
+      <input type="text" id="field-serial" placeholder="예: 6R3-0192" oninput="formatSerial(this)">
+    </div>
+    <div class="row">
+      <div class="ig">
+        <label>기종명</label>
+        <select id="field-model">${TYPES_LIST.map(t=>`<option>${t}</option>`).join('')}</select>
+      </div>
+      <div class="ig">
+        <label>형식명</label>
+        <select id="field-type">
+          <option value="">선택</option>
+          <option>TR36</option><option>TR40</option><option>TR45</option><option>TR50</option>
+        </select>
+      </div>
+    </div>
+    <div class="ig">
+      <label>수요자명</label>
+      <input type="text" id="field-customer" placeholder="홍길동">
+    </div>
+    <div class="ig">
+      <label>지역</label>
+      <input type="text" id="field-region" placeholder="예: 전남 나주시">
+    </div>
+    <div class="ig">
+      <label>🎯 고장 부위</label>
+      <div class="zone-grid" id="field-zone-grid"></div>
+      <input type="hidden" id="field-zone-val">
+    </div>
+    <div class="ig">
+      <label>🔍 고장 내용</label>
+      <textarea id="field-fault" rows="2" placeholder="고장 내용을 입력하세요"></textarea>
+    </div>
+    <div class="ig">
+      <label>🔧 처리 내용</label>
+      <textarea id="field-repair" rows="2" placeholder="현장 처리 내용을 입력하세요"></textarea>
+    </div>
+    <div class="ig">
+      <label>메모</label>
+      <textarea id="field-memo" rows="1"></textarea>
+    </div>
+    <button class="btn btn-blue" onclick="doFieldRegister()">🛠 현장처리 등록</button>
+    <button class="btn btn-outline" onclick="closeModal('modal-field')">취소</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <footer style="width:100%;text-align:center;padding:20px;font-size:11px;color:var(--gray4);margin-top:auto">
@@ -598,6 +653,8 @@ let checkinParts = [];
 let missingParts = [];
 let currentFilter = 'all';
 let currentHistoryFilter = 'all';
+let currentHistoryStatus = 'all';
+let currentTeamFilter = 'all';
 let qrScanner = null;
 let _toastTimer = null;
 let TYPES_LIST = ['로터 베이터'];
@@ -930,6 +987,9 @@ function renderIn() {
     <button class="btn btn-green" onclick="doRegister()">
       ${isTeam ? '📋 입고 신청하기' : '📥 입고 등록'}
     </button>
+    <button class="btn" style="background:#E0F2F1;color:#00796B;border:none;margin-top:0" onclick="openFieldRegister()">
+      🛠 현장처리로 등록
+    </button>
   </div>`;
 }
 
@@ -1216,12 +1276,48 @@ function renderStats() {
 // ── 우리팀 화면 (영업팀장) ──
 function renderMyTeam() {
   const list = allData.filter(r => r['영업팀']===TEAM);
-  const 신청 = list.filter(r=>r['상태']==='신청').length;
-  const 대기 = list.filter(r=>r['상태']==='대기').length;
-  const 진행 = list.filter(r=>r['상태']==='AS중').length;
-  const 완료 = list.filter(r=>r['상태']==='완료').length;
+
+  // 상태별 분류
+  const 입고대기  = list.filter(r=>r['상태']==='신청');
+  const AS대기    = list.filter(r=>r['상태']==='대기');
+  const 진행중    = list.filter(r=>r['상태']==='AS중');
+  const 출고대기  = list.filter(r=>r['상태']==='완료');
+  const 출고완료  = list.filter(r=>r['상태']==='출고');
+  const 현장처리  = list.filter(r=>r['상태']==='현장처리');
+
   const dates = list.map(r=>r['신청일시']?new Date(r['신청일시']):null).filter(d=>d&&!isNaN(d));
   const lastUpdate = dates.length ? new Date(Math.max(...dates)) : null;
+
+  // 섹션 헬퍼
+  function section(icon, title, items, color, showEditDel=false, showField=false) {
+    if (!items.length) return '';
+    return `
+    <div class="sec-label" style="color:${color};margin-top:14px">${icon} ${title} · ${items.length}건</div>
+    ${items.map(r => {
+      const serial = esc(r['제조번호']);
+      return `
+      <div class="li">
+        <div class="li-top">
+          <div>
+            <div class="li-model">${esc(r['기종명']||'')} ${esc(r['형식명']||'')}</div>
+            <div class="li-serial">🔖 ${serial}${r['수요자명']?' · '+esc(r['수요자명']):''}${r['지역']?' · '+esc(r['지역']):''}</div>
+          </div>
+          <span class="status ${statusClass(r['상태'])}">${r['상태']}</span>
+        </div>
+        ${r['긴급여부']==='Y'?`<span class="urgent-tag">🚨 긴급</span>`:''}
+        ${r['고장부위']?`<span class="zone-tag">🎯 ${esc(r['고장부위'])}</span>`:''}
+        ${r['고장내용']?`<div style="font-size:12px;color:var(--gray2);margin-top:6px">🔍 ${esc(r['고장내용'])}</div>`:''}
+        ${r['수리내역']?`<div style="font-size:12px;color:var(--gray2);margin-top:4px">🔧 ${esc(r['수리내역'])}</div>`:''}
+        ${showField&&r['상태']==='현장처리'&&r['완료일시']?`<div style="font-size:11px;color:var(--gray3);margin-top:4px">처리일: ${formatDate(r['완료일시'])}</div>`:''}
+        <div style="font-size:11px;color:var(--gray4);margin-top:4px">신청: ${formatDate(r['신청일시'])}</div>
+        ${showEditDel ? `
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="btn-sm b" onclick="openEditInfo('${serial}')">✏️ 수정</button>
+          <button class="btn-sm r" onclick="confirmDelete('${serial}','신청')">🗑 삭제</button>
+        </div>` : ''}
+      </div>`;
+    }).join('')}`;
+  }
 
   return `
   <div class="card">
@@ -1246,60 +1342,59 @@ function renderMyTeam() {
 
   <div class="card" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);color:white">
     <div style="font-size:13px;font-weight:700;opacity:.85;margin-bottom:14px">📊 ${esc(TEAM)} AS 현황</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:14px;text-align:center">
-        <div style="font-size:30px;font-weight:900">${신청+대기}</div>
-        <div style="font-size:11px;opacity:.85;margin-top:3px">📥 입고 예정</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:24px;font-weight:900">${입고대기.length}</div>
+        <div style="font-size:10px;opacity:.85;margin-top:3px">📋 입고대기</div>
       </div>
-      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:14px;text-align:center">
-        <div style="font-size:30px;font-weight:900">${진행}</div>
-        <div style="font-size:11px;opacity:.85;margin-top:3px">🔧 AS 진행중</div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:24px;font-weight:900">${AS대기.length}</div>
+        <div style="font-size:10px;opacity:.85;margin-top:3px">⏳ AS대기</div>
       </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:12px;text-align:center">
-        <div style="font-size:24px;font-weight:900">${완료}</div>
-        <div style="font-size:11px;opacity:.8;margin-top:3px">✅ 완료 대기</div>
-      </div>
-      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:12px;text-align:center">
-        <div style="font-size:24px;font-weight:900">${list.length}</div>
-        <div style="font-size:11px;opacity:.8;margin-top:3px">📋 전체</div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:24px;font-weight:900">${진행중.length}</div>
+        <div style="font-size:10px;opacity:.85;margin-top:3px">🔧 진행중</div>
       </div>
     </div>
-    <div style="background:rgba(0,0,0,.15);border-radius:8px;padding:8px 12px;font-size:11px;opacity:.9">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:22px;font-weight:900">${출고대기.length}</div>
+        <div style="font-size:10px;opacity:.8;margin-top:3px">✅ 출고대기</div>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:22px;font-weight:900">${출고완료.length}</div>
+        <div style="font-size:10px;opacity:.8;margin-top:3px">🚚 출고완료</div>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:22px;font-weight:900">${현장처리.length}</div>
+        <div style="font-size:10px;opacity:.8;margin-top:3px">🛠 현장처리</div>
+      </div>
+    </div>
+    <div style="background:rgba(0,0,0,.15);border-radius:8px;padding:8px 12px;font-size:11px;opacity:.9;margin-top:8px">
       🕐 마지막 업데이트: ${lastUpdate ? formatDate(lastUpdate) : '없음'}
     </div>
   </div>
 
   ${list.length===0
     ? `<div class="empty"><div class="empty-icon">📋</div><p>${esc(TEAM)} AS 내역이 없어요</p></div>`
-    : list.map(r=>`
-    <div class="card" style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-        <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:700">${esc(r['기종명'])} ${esc(r['형식명'])}</div>
-          <div style="font-size:11px;color:var(--gray3);margin-top:2px">
-            🔖 ${esc(r['제조번호'])}${r['수요자명']?' · '+esc(r['수요자명']):''}
-          </div>
-        </div>
-        <span class="status ${statusClass(r['상태'])}" style="flex-shrink:0">${r['상태']}</span>
-      </div>
-      ${r['고장부위']?`<span class="zone-tag" style="margin-top:6px;display:inline-block">🎯 ${esc(r['고장부위'])}</span>`:''}
-      ${r['고장내용']?`<div style="font-size:12px;color:var(--gray2);margin-top:6px">🔍 ${esc(r['고장내용'])}</div>`:''}
-      ${r['수리내역']?`<div style="font-size:12px;color:var(--gray2);margin-top:4px">🔧 ${esc(r['수리내역'])}</div>`:''}
-      <div style="font-size:11px;color:var(--gray3);margin-top:8px">신청: ${formatDate(r['신청일시'])}</div>
-      ${r['상태']==='신청' ? `
-      <div style="display:flex;gap:6px;margin-top:8px">
-        <button class="btn-sm b" onclick="openEditInfo('${esc(r['제조번호'])}')">✏️ 수정</button>
-        <button class="btn-sm r" onclick="confirmDelete('${esc(r['제조번호'])}','신청')">🗑 삭제</button>
-      </div>` : (r['상태']==='대기'||r['상태']==='AS중') ? `
-      <div style="font-size:11px;color:var(--gray4);margin-top:6px">입고 후 변경은 부서장/관리자에게 요청</div>` : ''}
-    </div>`).join('')}`;
+    : `
+    ${section('📋','입고대기 (본사 미도착)', 입고대기, '#E65100', true)}
+    ${section('⏳','AS대기 (본사 입고완료)', AS대기, '#1565C0')}
+    ${section('🔧','진행중', 진행중, '#6A1B9A')}
+    ${section('✅','출고대기 (AS완료)', 출고대기, '#2E7D32')}
+    ${section('🚚','출고완료', 출고완료, '#757575')}
+    ${section('🛠','현장처리완료', 현장처리, '#00796B', false, true)}
+    `}`;
 }
 
 // ── 전체이력 화면 ──
 function renderHistory() {
   let list = TEAM ? allData.filter(r => r['영업팀']===TEAM) : allData.slice();
+
+  // 팀 필터 (관리자급만)
+  if (isAdminLike() && currentTeamFilter !== 'all') {
+    list = list.filter(r => r['영업팀']===currentTeamFilter);
+  }
 
   // 날짜 필터
   if (currentHistoryFilter !== 'all') {
@@ -1318,16 +1413,45 @@ function renderHistory() {
     });
   }
 
+  // 상태 필터
+  if (currentHistoryStatus !== 'all') {
+    list = list.filter(r => r['상태']===currentHistoryStatus);
+  }
+
   // 최신순 정렬
   list = list.slice().sort((a,b) => new Date(b['신청일시']||0) - new Date(a['신청일시']||0));
 
+  // 팀 목록 (관리자용)
+  const teamList = [...new Set(allData.map(r=>r['영업팀']).filter(Boolean))].sort();
+
+  const statusList = [
+    {v:'all',l:'전체'},{v:'신청',l:'입고대기'},{v:'대기',l:'AS대기'},
+    {v:'AS중',l:'진행중'},{v:'완료',l:'출고대기'},{v:'출고',l:'출고완료'},{v:'현장처리',l:'현장처리'}
+  ];
+
   let html = `
+  <!-- 날짜 필터 -->
   <div class="filter-row">
     <button class="filter-btn ${currentHistoryFilter==='all'  ?'active':''}" onclick="setHistoryFilter('all')">전체</button>
     <button class="filter-btn ${currentHistoryFilter==='week' ?'active':''}" onclick="setHistoryFilter('week')">이번주</button>
     <button class="filter-btn ${currentHistoryFilter==='month'?'active':''}" onclick="setHistoryFilter('month')">이번달</button>
   </div>
-  <div style="display:flex;gap:8px;margin-bottom:12px">
+
+  <!-- 상태 필터 -->
+  <div class="filter-row" style="margin-top:6px;flex-wrap:wrap">
+    ${statusList.map(s=>`
+    <button class="filter-btn ${currentHistoryStatus===s.v?'active':''}" onclick="setHistoryStatus('${s.v}')">${s.l}</button>`).join('')}
+  </div>
+
+  <!-- 팀 필터 (관리자급) -->
+  ${isAdminLike() && teamList.length ? `
+  <div class="filter-row" style="margin-top:6px;flex-wrap:wrap">
+    <button class="filter-btn ${currentTeamFilter==='all'?'active':''}" onclick="setTeamFilter('all')">전팀</button>
+    ${teamList.map(t=>`<button class="filter-btn ${currentTeamFilter===t?'active':''}" onclick="setTeamFilter('${esc(t)}')">${esc(t)}</button>`).join('')}
+  </div>` : ''}
+
+  <!-- 검색 -->
+  <div style="display:flex;gap:8px;margin-bottom:12px;margin-top:8px">
     <input type="text" id="history-search"
       placeholder="🔍 제조번호 또는 수요자명 검색"
       style="flex:1;padding:10px 13px;border:1.5px solid #E0E0E0;border-radius:10px;font-size:13px;font-family:inherit;outline:none"
@@ -1360,6 +1484,7 @@ function historyListHTML(list) {
       <div class="li-tags">
         ${r['긴급여부']==='Y'?`<span class="urgent-tag">🚨 긴급</span>`:''}
         ${r['고장부위']?`<span class="zone-tag">🎯 ${esc(r['고장부위'])}</span>`:''}
+        ${r['상태']==='현장처리'?`<span class="zone-tag" style="background:#E0F2F1;color:#00796B">🛠 현장처리</span>`:''}
       </div>
       ${r['고장내용']?`<div style="font-size:12px;color:var(--gray3);margin-top:6px">🔍 ${esc(r['고장내용'])}</div>`:''}
       ${r['수리내역']?`<div style="font-size:12px;color:var(--gray3);margin-top:4px">🔧 ${esc(r['수리내역'])}</div>`:''}
@@ -1368,10 +1493,14 @@ function historyListHTML(list) {
 }
 
 function setHistoryFilter(f) { currentHistoryFilter=f; renderScreen('history'); }
+function setHistoryStatus(s) { currentHistoryStatus=s; renderScreen('history'); }
+function setTeamFilter(t)    { currentTeamFilter=t;    renderScreen('history'); }
 
 function runHistorySearch() {
   const q = (document.getElementById('history-search')?.value||'').trim().toUpperCase();
   let list = TEAM ? allData.filter(r => r['영업팀']===TEAM) : allData.slice();
+  if (isAdminLike() && currentTeamFilter !== 'all') list = list.filter(r=>r['영업팀']===currentTeamFilter);
+  if (currentHistoryStatus !== 'all') list = list.filter(r=>r['상태']===currentHistoryStatus);
   if (q) {
     list = list.filter(r =>
       (r['제조번호']||'').toUpperCase().includes(q) || (r['수요자명']||'').toUpperCase().includes(q)
@@ -2149,7 +2278,45 @@ async function doDelete() {
 }
 
 // ============================================================
-// 이력 조회
+// 현장처리 등록
+// ============================================================
+function openFieldRegister() {
+  renderZoneGrid('field-zone-grid','field-zone-val','');
+  // 기종 select 동적 채움
+  const modelSel = document.getElementById('field-model');
+  if (modelSel) modelSel.innerHTML = TYPES_LIST.map(t=>`<option>${esc(t)}</option>`).join('');
+  openModal('modal-field');
+}
+
+async function doFieldRegister() {
+  const serial   = (document.getElementById('field-serial')?.value||'').trim().toUpperCase();
+  const model    = document.getElementById('field-model')?.value || '로터 베이터';
+  const type     = document.getElementById('field-type')?.value || '';
+  const customer = (document.getElementById('field-customer')?.value||'').trim();
+  const region   = (document.getElementById('field-region')?.value||'').trim();
+  const fault    = (document.getElementById('field-fault')?.value||'').trim();
+  const repair   = (document.getElementById('field-repair')?.value||'').trim();
+  const memo     = (document.getElementById('field-memo')?.value||'').trim();
+  const zone     = document.getElementById('field-zone-val')?.value||'';
+
+  if (!serial) { showToast('제조번호를 입력하세요','err'); return; }
+
+  showToast('⏳ 등록 중...');
+  const res = await postAPI({
+    action: 'fieldRepair', serial, model, type, customer, region, fault, repair, memo, faultZone: zone
+  });
+
+  if (res.success) {
+    showToast('🛠 현장처리 등록 완료','ok');
+    closeModal('modal-field');
+    // 폼 초기화
+    ['field-serial','field-customer','field-region','field-fault','field-repair','field-memo']
+      .forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+    document.getElementById('field-zone-val').value='';
+    await loadData();
+  } else showToast('❌ ' + res.error,'err');
+}
+
 // ============================================================
 async function doSearch() {
   const input  = document.getElementById('search-serial');
@@ -2344,7 +2511,7 @@ function formatDate(v, short) {
 
 // 상태 CSS 클래스
 function statusClass(s) {
-  return { '신청':'s-req','대기':'s-wait','AS중':'s-ing','완료':'s-done','출고':'s-out' }[s]||'';
+  return { '신청':'s-req','대기':'s-wait','AS중':'s-ing','완료':'s-done','출고':'s-out','현장처리':'s-field' }[s]||'';
 }
 
 // XSS 방지 이스케이프
