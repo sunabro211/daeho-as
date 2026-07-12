@@ -966,6 +966,9 @@ function renderIn() {
   const isAdmin = ROLE === 'admin';
   const isChief = ROLE === 'chief' || ROLE === 'factory';
 
+  // zone grid는 DOM 생성 후 렌더링
+  setTimeout(() => renderZoneGrid('in-zone-grid','in-zone-val',''), 0);
+
   return `
   <!-- 기계 이력 조회 -->
   <div class="card">
@@ -1070,6 +1073,13 @@ function renderIn() {
           <button onclick="addNewPart()">+ 추가</button>
         </div>
       </div>
+    </div>
+
+    <!-- 고장 부위 (선택) -->
+    <div class="ig">
+      <label>🎯 고장 부위 <span class="opt">(선택)</span></label>
+      <div class="zone-grid" id="in-zone-grid"></div>
+      <input type="hidden" id="in-zone-val">
     </div>
 
     <!-- 메모 -->
@@ -1965,6 +1975,7 @@ async function doRegister() {
   const customer = (document.getElementById('in-customer')?.value||'').trim();
   const memo     = (document.getElementById('in-memo')?.value||'').trim();
   const urgent   = document.getElementById('in-urgent')?.checked || false;
+  const faultZone = document.getElementById('in-zone-val')?.value || '';
 
   if (!serial) { showToast('제조번호를 입력하세요','err'); return; }
   if (!type)   { showToast('형식명을 선택하세요','err'); return; }
@@ -1980,7 +1991,7 @@ async function doRegister() {
   showToast('⏳ 신청 중...');
   const res = await postAPI({
     action:'register', serial, model, type, team, region, customer, memo, urgent,
-    parts: partChecks.join(' / ')
+    faultZone, parts: partChecks.join(' / ')
   });
 
   if (res.success) {
@@ -1991,6 +2002,7 @@ async function doRegister() {
     document.getElementById('in-customer').value = '';
     document.getElementById('in-memo').value     = '';
     if (document.getElementById('in-region')) document.getElementById('in-region').value = '';
+    if (document.getElementById('in-zone-val')) { document.getElementById('in-zone-val').value=''; renderZoneGrid('in-zone-grid','in-zone-val',''); }
     document.getElementById('parts-section').style.display = 'none';
     if (document.getElementById('in-urgent')) document.getElementById('in-urgent').checked = false;
     await loadData();
