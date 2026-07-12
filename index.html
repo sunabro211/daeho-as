@@ -700,14 +700,14 @@ const ROLE_INFO = {
   factory:  { name:'공장장',          label:'공장장 화면',       tabs:['in','wait','progress','done','history','stats'] },
   admin:    { name:'Suneth (관리자)', label:'관리자 화면',       tabs:['in','wait','progress','done','history','stats'] },
   as:       { name:'AS팀장',          label:'AS팀장 화면',       tabs:['in','wait','progress','done','history'] },
-  team1:    { name:'1팀 팀장',        label:'1팀 입고신청',      tabs:['in','myteam','history'] },
-  team3:    { name:'3팀 팀장',        label:'3팀 입고신청',      tabs:['in','myteam','history'] },
-  team4:    { name:'4팀 팀장',        label:'4팀 입고신청',      tabs:['in','myteam','history'] },
-  team5:    { name:'5팀 팀장',        label:'5팀 입고신청',      tabs:['in','myteam','history'] },
-  team6:    { name:'6팀 팀장',        label:'6팀 입고신청',      tabs:['in','myteam','history'] },
-  teamrd:   { name:'로보드림 팀장',   label:'로보드림 입고신청', tabs:['in','myteam','history'] },
+  team1:    { name:'1팀 팀장',        label:'1팀 입고신청',      tabs:['in','myteam','field','history'] },
+  team3:    { name:'3팀 팀장',        label:'3팀 입고신청',      tabs:['in','myteam','field','history'] },
+  team4:    { name:'4팀 팀장',        label:'4팀 입고신청',      tabs:['in','myteam','field','history'] },
+  team5:    { name:'5팀 팀장',        label:'5팀 입고신청',      tabs:['in','myteam','field','history'] },
+  team6:    { name:'6팀 팀장',        label:'6팀 입고신청',      tabs:['in','myteam','field','history'] },
+  teamrd:   { name:'로보드림 팀장',   label:'로보드림 입고신청', tabs:['in','myteam','field','history'] },
   viewer:   { name:'사무실 조회',     label:'전체 조회 (읽기전용)', tabs:['wait','progress','done','history','stats'] },
-  employee: { name:'직원',            label:'직원 화면',         tabs:['in','myteam','history'] },
+  employee: { name:'직원',            label:'직원 화면',         tabs:['in','myteam','field','history'] },
 };
 
 // ── 팀 역할 → 팀 이름 ──
@@ -861,6 +861,7 @@ function buildTabs() {
     history:  { icon:'📜', label:'전체이력' },
     stats:    { icon:'📊', label:'통계' },
     myteam:   { icon:'👀', label:'우리팀' },
+    field:    { icon:'🛠', label:'현장처리' },
   };
   const bar = document.getElementById('tab-bar');
   bar.innerHTML = '';
@@ -925,6 +926,7 @@ function renderScreen(tab) {
     case 'history':  c.innerHTML = renderHistory();  break;
     case 'stats':    c.innerHTML = renderStats();    break;
     case 'myteam':   c.innerHTML = renderMyTeam();   loadStaffList().then(renderMyTeamStaffSection); break;
+    case 'field':    c.innerHTML = renderFieldTab();  break;
     default:         c.innerHTML = '<div class="empty"><div class="empty-icon">🚧</div><p>준비 중</p></div>';
   }
   // 조회 전용 모드: 버튼 전부 비활성화
@@ -1460,6 +1462,80 @@ function renderMyTeam() {
     ${section('🚚','출고완료', 출고완료, '#757575')}
     ${section('🛠','현장처리완료', 현장처리, '#00796B', false, true)}
     `}`;
+}
+
+// ── 현장처리 화면 (팀장/직원) ──
+function renderFieldTab() {
+  const list = allData
+    .filter(r => r['상태']==='현장처리' && (!TEAM || r['영업팀']===TEAM))
+    .slice().sort((a,b) => new Date(b['신청일시']||0) - new Date(a['신청일시']||0));
+
+  // 이번달 통계
+  const now = new Date();
+  const thisMonth = list.filter(r => {
+    const d = new Date(r['신청일시']);
+    return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  });
+
+  // 고장부위 집계
+  const byZone = {};
+  list.forEach(r => { if(r['고장부위']) byZone[r['고장부위']] = (byZone[r['고장부위']]||0)+1; });
+  const topZone = Object.entries(byZone).sort((a,b)=>b[1]-a[1]).slice(0,3);
+
+  let html = `
+  <!-- 현장처리 요약 카드 -->
+  <div class="card" style="background:linear-gradient(135deg,#004D40,#00796B);color:white;margin-bottom:12px">
+    <div style="font-size:13px;font-weight:700;opacity:.85;margin-bottom:12px">🛠 ${esc(TEAM||'')} 현장처리 현황</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:26px;font-weight:900">${list.length}</div>
+        <div style="font-size:10px;opacity:.85;margin-top:3px">📋 전체</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:26px;font-weight:900">${thisMonth.length}</div>
+        <div style="font-size:10px;opacity:.85;margin-top:3px">📅 이번달</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:26px;font-weight:900">${topZone[0]?topZone[0][1]:0}</div>
+        <div style="font-size:10px;opacity:.85;margin-top:3px">🎯 ${topZone[0]?esc(topZone[0][0]):'없음'}</div>
+      </div>
+    </div>
+    ${topZone.length ? `
+    <div style="background:rgba(0,0,0,.15);border-radius:8px;padding:8px 12px;font-size:11px;opacity:.9">
+      🎯 주요 고장: ${topZone.map(([z,c])=>`${esc(z)} ${c}건`).join(' · ')}
+    </div>` : ''}
+  </div>
+
+  <!-- 신규 현장처리 등록 버튼 -->
+  <button onclick="openFieldRegister()"
+    style="width:100%;padding:13px;background:#E0F2F1;color:#00796B;border:2px dashed #80CBC4;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px">
+    🛠 + 현장처리 새로 등록
+  </button>`;
+
+  if (!list.length) {
+    html += `<div class="empty"><div class="empty-icon">🛠</div><p>현장처리 내역이 없어요</p></div>`;
+    return html;
+  }
+
+  html += `<div class="sec-label">전체 ${list.length}건</div>`;
+
+  const items = list.map(r => `
+  <div class="li">
+    <div class="li-top">
+      <div>
+        <div class="li-model">${esc(r['기종명']||'')} ${esc(r['형식명']||'')}</div>
+        <div class="li-serial">🔖 ${esc(r['제조번호'])}${r['수요자명']?' · '+esc(r['수요자명']):''}${r['지역']?' · '+esc(r['지역']):''}</div>
+      </div>
+      <span class="status s-field">현장처리</span>
+    </div>
+    ${r['고장부위']?`<span class="zone-tag" style="background:#E0F2F1;color:#00796B;margin-top:6px;display:inline-block">🎯 ${esc(r['고장부위'])}</span>`:''}
+    ${r['고장내용']?`<div style="font-size:12px;color:var(--gray2);margin-top:6px">🔍 ${esc(r['고장내용'])}</div>`:''}
+    ${r['수리내역']?`<div style="font-size:12px;color:var(--gray2);margin-top:4px">🔧 ${esc(r['수리내역'])}</div>`:''}
+    <div style="font-size:11px;color:var(--gray4);margin-top:6px">처리일: ${formatDate(r['신청일시'])}</div>
+  </div>`);
+
+  html += pcListWrap(items);
+  return html;
 }
 
 // ── 전체이력 화면 ──
