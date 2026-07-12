@@ -35,15 +35,17 @@
 body{font-family:'Noto Sans KR',sans-serif;background:#ECEFF1;min-height:100vh;display:flex;flex-direction:column;align-items:center;-webkit-font-smoothing:antialiased}
 
 /* ── 헤더 ── */
-header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E3C 100%);color:white;padding:0 16px;box-shadow:0 3px 12px rgba(0,0,0,.3);position:sticky;top:0;z-index:100}
-.header-top{display:flex;align-items:center;justify-content:space-between;padding:10px 0 6px}
-.logo-wrap{display:flex;align-items:center;gap:10px}
-.logo-badge{background:white;border-radius:10px;padding:6px 10px;display:flex;flex-direction:column;align-items:center;line-height:1.1}
+header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E3C 100%);color:white;padding:0 12px;box-shadow:0 3px 12px rgba(0,0,0,.3);position:sticky;top:0;z-index:100}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding:10px 0 6px;gap:6px;min-width:0}
+.logo-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.logo-badge{background:white;border-radius:10px;padding:6px 10px;display:flex;flex-direction:column;align-items:center;line-height:1.1;flex-shrink:0}
 .logo-daeho{font-size:15px;font-weight:900;color:#1B5E20;letter-spacing:2px}
 .logo-co{font-size:8px;font-weight:600;color:#2E7D32;letter-spacing:1px}
-.header-title h1{font-size:15px;font-weight:700;margin-left:10px;letter-spacing:-.3px}
-.header-title span{font-size:10px;opacity:.8;display:block;margin-left:10px;margin-top:1px}
-.role-chip{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.header-title{flex:1;min-width:0;overflow:hidden}
+.header-title h1{font-size:14px;font-weight:700;margin-left:8px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-title span{font-size:10px;opacity:.8;display:block;margin-left:8px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.role-chip{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:5px 10px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;max-width:180px}
+.role-chip span{overflow:hidden;text-overflow:ellipsis;max-width:80px}
 .online-dot{width:7px;height:7px;border-radius:50%;background:#69F0AE;box-shadow:0 0 6px #69F0AE;flex-shrink:0}
 
 /* ── 탭 ── */
@@ -56,7 +58,8 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 .nbadge.blue{background:var(--blue2)}
 
 /* ── 컨텐츠 ── */
-.content{width:100%;max-width:480px;padding:14px;flex:1}
+.desktop-wrap{display:block}
+.content{width:100%;padding:12px}
 
 /* ============================================================
    PC 반응형 레이아웃 (900px 이상)
@@ -1017,7 +1020,9 @@ function renderIn() {
     <div class="row">
       <div class="ig">
         <label>기종명</label>
-        <select id="in-model">${TYPES_LIST.map(t=>`<option>${esc(t)}</option>`).join('')}</select>
+        <select id="in-model">
+          ${TYPES_LIST.length ? TYPES_LIST.map(t=>`<option>${esc(t)}</option>`).join('') : '<option>로터 베이터</option>'}
+        </select>
       </div>
       <div class="ig">
         <label>형식명 <span style="color:var(--red2)">*</span></label>
