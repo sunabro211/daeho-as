@@ -70,10 +70,10 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 
   /* 헤더 */
   header{position:sticky;top:0;width:100%}
-  .header-top{max-width:1280px;margin:0 auto;padding:12px 24px}
+  .header-top{max-width:1600px;margin:0 auto;padding:12px 24px}
 
   /* 메인 래퍼 */
-  .desktop-wrap{display:flex;max-width:1280px;margin:0 auto;padding:20px 24px;gap:20px;align-items:flex-start}
+  .desktop-wrap{display:flex;max-width:1600px;margin:0 auto;padding:20px 24px;gap:20px;align-items:flex-start}
 
   /* 왼쪽 사이드바 탭 */
   .tabs{
@@ -129,6 +129,13 @@ header{width:100%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E
 
   /* 통계 그리드 더 넓게 */
   .stat-grid{grid-template-columns:repeat(3,1fr)}
+}
+
+/* ── 초대형 화면 (1500px 이상): 3열 + 전체 살짝 확대 ── */
+@media(min-width:1500px){
+  body{zoom:1.12}
+  .pc-grid{grid-template-columns:repeat(3,1fr)}
+  .pc-list-grid{grid-template-columns:repeat(3,1fr)}
 }
 
 /* ── 카드 ── */
