@@ -9,7 +9,8 @@
 <meta name="apple-mobile-web-app-title" content="대호AS관리">
 <meta name="theme-color" content="#1B5E20">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="favicon.ico">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <!-- QR 스캔 라이브러리 -->
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -929,13 +930,15 @@ function showSettingsGear() {
 // PWA manifest 동적 업데이트
 function updateManifest() {
   try {
+    // 절대경로로 지정해야 홈화면 설치 시 로고가 제대로 뜸 (호스팅 이전에도 자동 대응)
+    const abs = p => new URL(p, location.href).href;
     const data = {
       name:'대호AS관리', short_name:'대호AS',
-      start_url: `/daeho-as/?k=${ACCESS_KEY}`,
+      start_url: abs(`?k=${ACCESS_KEY}`),
       display:'standalone', background_color:'#1B5E20', theme_color:'#1B5E20',
       icons:[
-        { src:'icon-192.png', sizes:'192x192', type:'image/png' },
-        { src:'icon-512.png', sizes:'512x512', type:'image/png' }
+        { src: abs('icon-192.png'), sizes:'192x192', type:'image/png' },
+        { src: abs('icon-512.png'), sizes:'512x512', type:'image/png' }
       ]
     };
     const blob = new Blob([JSON.stringify(data)], { type:'application/json' });
