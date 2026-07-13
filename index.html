@@ -851,7 +851,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (['chief','factory','admin','as','viewer'].includes(ROLE)) {
     document.body.classList.add('premium');
     // 모달 아이콘도 SVG로 교체 (로드 시 1회, 값 입력 전이라 안전)
-    document.querySelectorAll('.modal-bg').forEach(m => { m.innerHTML = premiumizeHTML(m.innerHTML); });
+    document.querySelectorAll('.modal-bg').forEach(m => premiumizeDOM(m));
   }
 
   const info = ROLE_INFO[ROLE];
@@ -988,6 +988,25 @@ function premiumizeHTML(html) {
   EMOJI_SVG.forEach(([emo, svg]) => { html = html.split(emo).join(svg); });
   return html;
 }
+// 텍스트에만 안전하게 적용 (placeholder 등 속성은 건드리지 않음)
+function premiumizeDOM(root) {
+  if (!root) return;
+  const SKIP = ['TEXTAREA','SCRIPT','STYLE','OPTION','INPUT','SELECT'];
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const targets = [];
+  while (walker.nextNode()) {
+    const n = walker.currentNode;
+    if (n.parentNode && !SKIP.includes(n.parentNode.nodeName) &&
+        EMOJI_SVG.some(([e]) => n.nodeValue.includes(e))) targets.push(n);
+  }
+  targets.forEach(n => {
+    let html = n.nodeValue.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    EMOJI_SVG.forEach(([e, s]) => { html = html.split(e).join(s); });
+    const span = document.createElement('span');
+    span.innerHTML = html;
+    n.parentNode.replaceChild(span, n);
+  });
+}
 
 // 통계 숫자 카운트업 애니메이션
 function countUpStats() {
@@ -1087,7 +1106,7 @@ function renderScreen(tab) {
   }
   // ── 프리미엄 UI 후처리 (관리자급 전용) ──
   if (IS_PREMIUM()) {
-    c.innerHTML = premiumizeHTML(c.innerHTML);
+    premiumizeDOM(c);
     c.classList.remove('fadein'); void c.offsetWidth; c.classList.add('fadein');
     if (tab === 'stats') countUpStats();
   }
